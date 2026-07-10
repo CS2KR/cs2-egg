@@ -209,7 +209,7 @@ run_with_spinner() {
     BUILD_LAST_LOG="$log_file"
 }
 
-run_with_spinner "Building ${FULL_IMAGE}" docker build -f KitsuneLab-Dockerfile -t "${FULL_IMAGE}" .
+run_with_spinner "Building ${FULL_IMAGE}" docker build -f Dockerfile -t "${FULL_IMAGE}" .
 if [[ -f "$BUILD_LAST_LOG" ]]; then
     size=$(docker image inspect "$FULL_IMAGE" -f '{{.Size}}' 2>/dev/null || echo 0)
     if [[ "$size" =~ ^[0-9]+$ ]] && [ "$size" -gt 0 ]; then

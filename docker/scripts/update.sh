@@ -12,6 +12,7 @@ source /scripts/updaters/metamod.sh
 source /scripts/updaters/counterstrikesharp.sh
 source /scripts/updaters/swiftlys2.sh
 source /scripts/updaters/modsharp.sh
+source /scripts/updaters/thirdparty.sh
 
 # Backwards compatibility: Map old ADDON_SELECTION to new boolean variables
 migrate_addon_selection() {
@@ -125,6 +126,9 @@ update_addons() {
 
     # Patch RequireLoginForDedicatedServers setting based on ALLOW_TOKENLESS
     patch_tokenless_setting
+
+    # CS2.KR: 서드파티 플러그인 갱신 (Metamod/CSS 본체가 갱신된 뒤에 돌아야 한다)
+    update_thirdparty_plugins
 
     # Clean up
     rm -rf "$TEMP_DIR"
