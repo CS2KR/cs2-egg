@@ -1,80 +1,83 @@
-# Auto-Updaters
+# 프레임워크 자동업데이트
 
-Automatically update MetaMod, CounterStrikeSharp, SwiftlyS2, and ModSharp on server startup with independent control per framework.
+서버가 기동할 때 MetaMod, CounterStrikeSharp, SwiftlyS2, ModSharp 를 각각 최신으로 갱신합니다.
 
-## Overview
+서드파티 **플러그인**(WeaponPaints, cs2kz 등)은 이것과 별개입니다.
+[서드파티 플러그인 자동업데이트](plugin-updater.md) 를 보세요.
 
-The egg includes automatic updaters for popular CS2 server plugins with **multi-framework support** → enable multiple frameworks simultaneously:
+## 개요
 
-- **MetaMod:Source** → Core plugin framework (required for CSS)
-- **CounterStrikeSharp (CSS)** → C# plugin framework (.NET 8)
-- **SwiftlyS2** → Standalone C# framework v2 (no MetaMod required)
-- **ModSharp** → Standalone C# platform with .NET 9 runtime
+- **MetaMod:Source** — 플러그인 프레임워크의 토대 (CSS 의 전제 조건)
+- **CounterStrikeSharp (CSS)** — C# 플러그인 프레임워크
+- **SwiftlyS2** — 단독으로 도는 C# 프레임워크 (MetaMod 불필요)
+- **ModSharp** — .NET 런타임을 품은 단독 C# 플랫폼
 
-Updates happen automatically on server startup, keeping your plugins current without manual intervention.
+갱신은 서버가 뜰 때 자동으로 일어납니다. 설치된 버전은 `/home/container/egg/versions.txt` 에 기록됩니다.
 
-**Version Tracking:** All addon versions are stored in `/home/container/egg/versions.txt`
+## 설정
 
-## Configuration
+### 프레임워크 고르기
 
-### Multi-Framework Selection
+각각 독립적으로 켜고 끕니다.
 
-Each framework has an independent boolean toggle in the Pterodactyl panel:
+| 변수 | 설명 |
+| --- | --- |
+| `INSTALL_METAMOD` | MetaMod:Source (CSS 의 전제 조건) |
+| `INSTALL_CSS` | CounterStrikeSharp (켜면 MetaMod 가 자동으로 함께 켜짐) |
+| `INSTALL_SWIFTLY` | SwiftlyS2 (단독) |
+| `INSTALL_MODSHARP` | ModSharp (단독) |
 
-| Variable             | Description                                      | Auto-Updates |
-| -------------------- | ------------------------------------------------ | ------------ |
-| `INSTALL_METAMOD`    | MetaMod:Source (required for CSS)                | [✓]           |
-| `INSTALL_CSS`        | CounterStrikeSharp (auto-enables MetaMod)        | [✓]           |
-| `INSTALL_SWIFTLY`    | SwiftlyS2 standalone (no MetaMod required)       | [✓]           |
-| `INSTALL_MODSHARP`   | ModSharp standalone with .NET 9                  | [✓]           |
+### 켜는 법
 
-**Multi-Framework Examples:**
-- MetaMod + CSS + SwiftlyS2 → All three enabled simultaneously [✓]
-- MetaMod + ModSharp → Compatible combination [✓]
-- CSS only → MetaMod auto-enabled as dependency [✓]
-- ModSharp + CSS → ModSharp auto-disabled (incompatible) [✗]
-- ModSharp + SwiftlyS2 → ModSharp auto-disabled (incompatible) [✗]
+**패널에서**
 
-### Setting Up
+1. **Startup** 탭으로 갑니다.
+2. 원하는 프레임워크를 켭니다.
+3. 저장하고 서버를 재시작합니다.
 
-**Via Pterodactyl Panel:**
-
-1. Go to **Startup** tab
-2. Toggle checkboxes for desired frameworks:
-   - ☑ MetaMod:Source
-   - ☑ CounterStrikeSharp
-   - ☐ SwiftlyS2
-   - ☑ ModSharp
-3. Save and restart server
-
-**Via Environment Variables:**
+**환경변수로**
 
 ```bash
 INSTALL_METAMOD=1
 INSTALL_CSS=1
 INSTALL_SWIFTLY=0
-INSTALL_MODSHARP=1
+INSTALL_MODSHARP=0
 ```
 
-### Dependency Handling
+### 의존 관계
 
-The egg automatically handles dependencies:
+CSS 를 켰는데 MetaMod 가 꺼져 있으면 egg 가 알아서 켭니다.
 
 ```
-CSS enabled + MetaMod disabled
-       ↓
-[WARNING] CounterStrikeSharp requires MetaMod:Source, auto-enabling...
-       ↓
-Both MetaMod and CSS installed
+CS2.KR | 경고   | CounterStrikeSharp 는 MetaMod:Source 가 필요합니다. 자동으로 켭니다...
 ```
 
-### Load Order Management
+### 함께 쓰면 충돌할 수 있는 조합
 
-**MetaMod always loads first** after Game_LowViolence (critical for proper initialization):
+ModSharp 는 다른 C# 프레임워크와 잘 맞지 않습니다. 함께 켜져 있으면 egg 가 **경고만** 합니다.
+자동으로 꺼 주지는 않습니다. 하나만 쓰세요.
+
+```
+CS2.KR | 경고   | ModSharp 와 CounterStrikeSharp 가 함께 있습니다. 서로 충돌할 수 있으니 하나만 쓰기를 권합니다.
+CS2.KR | 경고   | ModSharp 와 SwiftlyS2 가 함께 있습니다. 서로 충돌할 수 있으니 하나만 쓰기를 권합니다.
+```
+
+| 조합 | 상태 |
+| --- | --- |
+| MetaMod + CSS | 권장 |
+| MetaMod + CSS + SwiftlyS2 | 함께 쓸 수 있음 |
+| MetaMod + ModSharp | 함께 쓸 수 있음 |
+| ModSharp + CSS | 충돌 가능 (경고만 나옴) |
+| ModSharp + SwiftlyS2 | 충돌 가능 (경고만 나옴) |
+
+### 로드 순서
+
+**MetaMod 는 항상 `Game_LowViolence` 바로 뒤에 옵니다.** 초기화 순서상 반드시 그래야 합니다.
+egg 가 `ensure_metamod_first()` 로 알아서 맞춥니다.
 
 ```
 Game_LowViolence    csgo_lv
-            Game    csgo/addons/metamod        ← Always first
+            Game    csgo/addons/metamod        ← 항상 첫 번째
             Game    csgo/addons/counterstrikesharp
             Game    csgo/addons/swiftlys2
             Game    sharp                       ← ModSharp
@@ -84,166 +87,62 @@ Game_LowViolence    csgo_lv
 
 ## MetaMod:Source
 
-### What It Does
-
-- Downloads latest stable MetaMod from MetaMod downloads
-- Extracts to `game/csgo/addons/metamod/`
-- Configures `gameinfo.gi` automatically (always first position)
-- Stores version in `/home/container/egg/versions.txt`
-
-### How It Works
-
-1. Checks current installed version
-2. Fetches latest version from metamodsource.net
-3. Compares versions (format: `2.x-devXXXX`)
-4. Downloads and extracts if newer version available
-5. Updates `gameinfo.gi` to load MetaMod first
-
-### Console Output
+- metamodsource.net 에서 최신 안정판을 받습니다.
+- `game/csgo/addons/metamod/` 에 풉니다.
+- `gameinfo.gi` 를 자동으로 손봅니다 (항상 첫 번째 자리).
+- 버전을 `versions.txt` 에 기록합니다.
 
 ```
-[KitsuneLab] > Checking MetaMod updates...
-[KitsuneLab] > Update available for MetaMod: 2.x-dev1245 (current: 2.x-dev1234)
-[KitsuneLab] > MetaMod updated to 2.x-dev1245
+CS2.KR | 정보   | Metamod 갱신: 2.x-dev1245 (현재: 2.x-dev1234)
+CS2.KR | 완료   | Metamod 를 2.x-dev1245 으로 갱신했습니다
 ```
 
 ## CounterStrikeSharp
 
-### What It Does
-
-- Downloads latest CSS from GitHub releases
-- Extracts to `game/csgo/addons/counterstrikesharp/`
-- Installs with-runtime version (includes .NET runtime)
-- Auto-enables MetaMod if not already enabled
-- Stores version in `/home/container/egg/versions.txt`
-
-### Prerequisites
-
-- **MetaMod required** → Automatically enabled when CSS is toggled on
-
-### How It Works
-
-1. Checks if MetaMod enabled (auto-enables with warning if not)
-2. Checks current CSS version
-3. Fetches latest release from roflmuffin/CounterStrikeSharp
-4. Downloads with-runtime Linux build
-5. Extracts and updates version tracking
-
-### Console Output
+- GitHub 릴리스(`roflmuffin/CounterStrikeSharp`)에서 최신본을 받습니다.
+- `game/csgo/addons/counterstrikesharp/` 에 풉니다.
+- .NET 런타임이 포함된 빌드를 씁니다.
+- MetaMod 가 꺼져 있으면 자동으로 켭니다.
 
 ```
-[KitsuneLab] > [WARNING] CounterStrikeSharp requires MetaMod:Source, auto-enabling...
-[KitsuneLab] > Checking CSS updates...
-[KitsuneLab] > CSS is up-to-date (v1.0.0)
+CS2.KR | 경고   | CounterStrikeSharp 는 MetaMod:Source 가 필요합니다. 자동으로 켭니다...
+CS2.KR | 완료   | CounterStrikeSharp 는 최신입니다 (v1.0.370)
 ```
 
-### Plugin Compatibility
-
-CSS updates may break plugins. Consider:
-
-- Test updates on development server first
-- Check plugin compatibility before updating
-- Monitor CSS changelog for breaking changes
-- Backup before enabling auto-updates
-
-### Multi-Framework Compatibility
-
-CounterStrikeSharp can coexist with:
-- [✓] MetaMod (required dependency)
-- [✓] SwiftlyS2
-- [✗] ModSharp (incompatible - ModSharp auto-disabled if CSS enabled)
+**플러그인 호환성**: CSS 를 올리면 플러그인이 깨질 수 있습니다. 테스트 서버에서 먼저 확인하고,
+플러그인의 변경 기록을 살펴보세요.
 
 ## SwiftlyS2
 
-### What It Does
-
-- Downloads latest SwiftlyS2 from GitHub releases
-- Extracts to `game/csgo/addons/swiftlys2/`
-- Installs with-runtime Linux version
-- Configures `gameinfo.gi` automatically
-- **Standalone** → No MetaMod dependency
-- Stores version in `/home/container/egg/versions.txt`
-
-### Prerequisites
-
-- **None** → Completely standalone framework
-
-### How It Works
-
-1. Checks current SwiftlyS2 version
-2. Fetches latest from swiftly-solution/swiftlys2
-3. Downloads with-runtimes-linux.zip
-4. Extracts swiftlys2 directory
-5. Updates `gameinfo.gi` to load SwiftlyS2
-6. Removes old metamod VDF file if present (legacy cleanup)
-
-### Console Output
+- GitHub 릴리스(`swiftly-solution/swiftlys2`)에서 받습니다.
+- `game/csgo/addons/swiftlys2/` 에 풉니다.
+- `gameinfo.gi` 를 자동으로 손봅니다.
+- **MetaMod 가 필요 없습니다.**
+- 예전에 남은 `metamod/swiftlys2.vdf` 가 있으면 지웁니다.
 
 ```
-[KitsuneLab] > Checking SwiftlyS2 updates...
-[KitsuneLab] > Update available for SwiftlyS2: v0.2.38 (current: v0.2.37)
-[KitsuneLab] > SwiftlyS2 updated to v0.2.38
+CS2.KR | 정보   | SwiftlyS2 갱신: v0.2.38 (현재: v0.2.37)
+CS2.KR | 완료   | SwiftlyS2 를 v0.2.38 으로 갱신했습니다 (bin + gamedata)
 ```
-
-### Multi-Framework Compatibility
-
-SwiftlyS2 can coexist with:
-- [✓] CounterStrikeSharp (CSS)
-- [✓] MetaMod
-- [✗] ModSharp (incompatible - auto-disabled if ModSharp enabled)
 
 ## ModSharp
 
-### What It Does
-
-- Downloads latest ModSharp from GitHub releases
-- Installs .NET 9 runtime automatically
-- Extracts to `game/sharp/`
-- Configures `gameinfo.gi` automatically
-- **Standalone** → No MetaMod dependency
-- Stores versions in `/home/container/egg/versions.txt`
-
-### Prerequisites
-
-- **None** → Completely standalone with bundled .NET 9
-
-### How It Works
-
-1. Checks and installs .NET 9.0.0 runtime if needed
-2. Checks current ModSharp version
-3. Fetches latest from Kxnrl/modsharp-public
-4. Downloads core + extensions assets
-5. Extracts preserving existing configs (`core.json` not overwritten)
-6. Updates `gameinfo.gi` to load ModSharp
-
-### Console Output
+- .NET 런타임을 먼저 설치합니다.
+- GitHub 릴리스(`Kxnrl/modsharp-public`)에서 core 와 extensions 를 받습니다.
+- `game/sharp/` 에 풉니다.
+- `gameinfo.gi` 를 자동으로 손봅니다.
+- 기존 설정(`core.json`, `admins.jsonc`)은 백업했다가 되돌립니다.
 
 ```
-[KitsuneLab] > Installing .NET 9.0.0 runtime...
-[KitsuneLab] > .NET 9.0.0 runtime installed successfully
-[KitsuneLab] > Checking ModSharp updates...
-[KitsuneLab] > Update available for ModSharp: git70 (current: git69)
-[KitsuneLab] > ModSharp updated to git70
+CS2.KR | 실행   | .NET 9.0.0 런타임을 설치합니다...
+CS2.KR | 완료   | .NET 9.0.0 런타임을 설치했습니다
+CS2.KR | 정보   | 갱신 가능: git70 (현재: git69)
+CS2.KR | 완료   | ModSharp 를 git70 으로 갱신했습니다
 ```
 
-### Configuration
+## 버전 기록
 
-ModSharp configs are in `game/sharp/configs/core.json`. First install creates default config, updates preserve your settings.
-
-### Multi-Framework Compatibility
-
-ModSharp can coexist with:
-- [✓] MetaMod only
-- [✗] CounterStrikeSharp (CSS) - incompatible, auto-disabled if ModSharp enabled
-- [✗] SwiftlyS2 - incompatible, auto-disabled if ModSharp enabled
-
-**Note:** ModSharp is a standalone framework that conflicts with other C# frameworks. Only MetaMod can run alongside it.
-
-## Version Tracking
-
-### Version File
-
-Versions are stored in `/home/container/egg/versions.txt`:
+`/home/container/egg/versions.txt` 에 이렇게 남습니다.
 
 ```
 Metamod=2.x-dev1245
@@ -253,272 +152,164 @@ ModSharp=git70
 DotNet=9.0.0
 ```
 
-### Location
+FTP 로 볼 수 있고 서버 백업에도 함께 들어갑니다.
 
-- **Path:** `/home/container/egg/versions.txt`
-- **Accessible via FTP:** Yes
-- **Backed up with server data:** Yes
+업데이터는 새 버전이 있을 때만 내려받습니다. 이미 최신이면 건너뛰므로 대역폭과 기동 시간을 아낍니다.
+설치된 것이 최신 릴리스보다 **새 버전**이면 다운그레이드하지 않습니다.
 
-### Smart Updates
+## 언제 갱신되는가
 
-The updater:
+- **서버가 뜰 때마다** 확인합니다.
+- **돌고 있는 중에는** 갱신하지 않습니다. 재시작해야 합니다.
 
-- [✓] Only downloads when new version available
-- [✓] Compares versions before downloading
-- [✓] Skips updates if already current
-- [✓] Logs all version changes
+### 강제로 다시 받기
 
-This saves bandwidth and startup time.
+1. `rm /home/container/egg/versions.txt`
+2. 서버 재시작
 
-## Update Schedule
+### 특정 프레임워크만 안 받기
 
-### When Updates Happen
+패널에서 그 프레임워크를 끄거나 환경변수를 `0` 으로 둡니다 (`INSTALL_CSS=0`).
 
-- **On server startup** → Every time container starts
-- **Not during runtime** → Server must restart to update
-- **After game updates** → Auto-restart triggers update
+### 프리릴리스 받기
 
-### Forcing Updates
+`PRERELEASE=1` 로 두면 프레임워크의 프리릴리스·베타도 내려받습니다. 불안정할 수 있습니다.
 
-To force update:
-
-1. Delete version file: `rm /home/container/egg/versions.txt` (via FTP or console)
-2. Restart server
-3. Will re-download latest versions
-
-### Preventing Updates
-
-To disable updates for specific framework:
-
-1. Toggle off the framework checkbox in Pterodactyl panel
-2. Or set environment variable to `0`: `INSTALL_CSS=0`
-3. Framework won't be updated or installed
-
-## Combining with Auto-Restart
-
-Auto-Restart + Auto-Updaters = Fully automated server:
+## 자동 재시작과 함께 쓰기
 
 ```
-CS2 Update Detected
+CS2 업데이트 감지
        ↓
-Server Restarts
+서버 재시작
        ↓
-Game Files Update (SteamCMD)
+게임 파일 갱신 (SteamCMD)
        ↓
-Plugins Update (Auto-Updaters)
+프레임워크 갱신 (이 문서)
        ↓
-gameinfo.gi Load Order Verified
+서드파티 플러그인 갱신 (plugin-updater.md)
        ↓
-Server Online with Latest Everything
+gameinfo.gi 로드 순서 확인
+       ↓
+전부 최신인 상태로 서버 기동
 ```
 
-Perfect for hands-off server management!
+## 잘 안 될 때
 
-## Troubleshooting
+### MetaMod 가 설치되지 않을 때
 
-### MetaMod Not Installing
-
-**Check:**
-
-- metamodsource.net accessible
-- Sufficient disk space
-- Write permissions on `game/csgo/addons/`
-
-**Solution:**
+- metamodsource.net 에 닿는지 확인하세요.
+- 디스크 여유가 있는지 확인하세요.
+- `game/csgo/addons/` 에 쓸 수 있는지 확인하세요.
 
 ```bash
-# Check manually
 curl -I https://www.metamodsource.net/downloads.php?branch=dev
 ```
 
-### CSS Not Installing
+### CSS 가 설치되지 않을 때
 
-**Check:**
+- MetaMod 가 자동으로 켜졌는지 로그의 경고를 확인하세요.
+- GitHub API 한도에 걸리지 않았는지 확인하세요.
+- 디스크 여유를 확인하세요.
 
-- MetaMod auto-enabled (check for [WARNING] message)
-- GitHub API not rate-limited
-- Downloaded correct platform (Linux)
-- Sufficient disk space
-
-**Common error:**
+흔한 오류입니다.
 
 ```
-[ERROR] No suitable asset found for roflmuffin/CounterStrikeSharp
+CS2.KR | 오류   | roflmuffin/CounterStrikeSharp 에서 알맞은 에셋을 찾지 못했습니다
 ```
 
-**Solution:** GitHub API rate limit → wait 1 hour or check network access
+대개 GitHub API 한도입니다. 한 시간 기다리거나 네트워크를 확인하세요.
 
-### SwiftlyS2 Not Installing
+### ModSharp 가 설치되지 않을 때
 
-**Check:**
+- .NET 런타임 설치가 성공했는지 확인하세요 (Microsoft CDN 접근).
+- core 와 extensions 두 에셋이 모두 받아졌는지 확인하세요.
+- .NET 런타임을 담을 디스크 여유를 확인하세요.
 
-- GitHub releases accessible
-- Correct asset downloaded (with-runtimes-linux.zip)
-- No file permission issues
+### 버전이 갱신되지 않을 때
 
-**Note:** SwiftlyS2 is standalone, doesn't require MetaMod
+같은 버전을 매번 다시 설치한다면 버전 파일이 제대로 쓰이지 않는 것입니다.
 
-### ModSharp Not Installing
+1. `/home/container/egg/versions.txt` 가 있고 읽히는지 확인하세요.
+2. `/home/container/egg/` 에 쓸 수 있는지 확인하세요.
+3. 갱신 중 콘솔에 에러가 없는지 확인하세요.
+4. 버전 파일을 지우고 재시작해 다시 만들게 하세요.
 
-**Check:**
+### 로드 순서 문제
 
-- .NET runtime installation succeeded
-- GitHub releases accessible
-- Both core and extensions assets downloading
-- Sufficient disk space for .NET 9 runtime
-
-**Common issue:** .NET runtime download failure → check Microsoft CDN access
-
-### Version Not Updating
-
-**Problem:** Same version reinstalls every startup
-
-**Cause:** Version file not being written/read correctly
-
-**Solution:**
-
-1. Check `/home/container/egg/versions.txt` exists and is readable
-2. Verify write permissions on `/home/container/egg/`
-3. Check for errors in console during update
-4. Delete version file and restart to regenerate
-
-### Load Order Issues
-
-**Problem:** Plugins not loading correctly
-
-**Cause:** Incorrect gameinfo.gi load order
-
-**Solution:** MetaMod must be first addon after LowViolence. The egg handles this automatically via `ensure_metamod_first()` function.
-
-**Verify load order:**
+플러그인이 제대로 로드되지 않으면 `gameinfo.gi` 순서를 확인하세요.
 
 ```bash
 cat game/csgo/gameinfo.gi | grep -A 10 "Game_LowViolence"
 ```
 
-Should show:
-```
-Game_LowViolence    csgo_lv
-            Game    csgo/addons/metamod        ← MetaMod FIRST
-            Game    csgo/addons/counterstrikesharp
-            ...other addons...
+MetaMod 가 `Game_LowViolence` 바로 뒤에 와야 합니다.
 
-            Game    csgo
+### GitHub API 한도
+
+```
+API rate limit exceeded  /  403 Forbidden
 ```
 
-### Rate Limiting
+비인증 요청은 IP 당 시간당 60회입니다. 한 시간 기다리거나, 재시작을 줄이거나,
+[GitHub 상태](https://www.githubstatus.com/)를 확인하세요.
 
-**Error:** `API rate limit exceeded` or `403 Forbidden`
+서드파티 플러그인 자동업데이트는 `GITHUB_TOKEN` 을 넣으면 5000회/시간으로 늘어납니다.
+프레임워크 업데이터도 같은 토큰의 영향을 받습니다.
 
-**Cause:** Too many requests to GitHub API
+## 옛 `ADDON_SELECTION` 변수
 
-**Solution:**
+예전 드롭다운을 쓰고 있다면 아래처럼 옮기세요. 당분간은 호환 처리가 남아 있습니다.
 
-- Wait 1 hour for rate limit reset
-- Less frequent restarts during development
-- Check GitHub status: https://www.githubstatus.com/
+| 옛 값 | 새 설정 |
+| --- | --- |
+| `Metamod Only` | `INSTALL_METAMOD=1` |
+| `Metamod + CounterStrikeSharp` | `INSTALL_METAMOD=1` + `INSTALL_CSS=1` |
+| `SwiftlyS2` | `INSTALL_SWIFTLY=1` |
+| `ModSharp` | `INSTALL_MODSHARP=1` |
 
-## Migration from Old System
+## 자주 묻는 것
 
-### Deprecated ADDON_SELECTION Variable
+**CSS 와 SwiftlyS2 를 함께 쓸 수 있나요?**
+네. 서로 호환됩니다.
 
-If you're using the old `ADDON_SELECTION` dropdown:
+**CSS 와 ModSharp 를 함께 쓸 수 있나요?**
+권하지 않습니다. 충돌할 수 있고, egg 는 경고만 하고 자동으로 끄지는 않습니다.
 
-**Warning Message:**
-```
-[KitsuneLab] > [WARNING] DEPRECATION WARNING
-[KitsuneLab] > [WARNING] The ADDON_SELECTION variable is deprecated and will be removed in the next update!
-[KitsuneLab] > [WARNING] Please update your Pterodactyl egg to use the new multi-framework support:
-[KitsuneLab] > [WARNING]   → INSTALL_METAMOD (boolean)
-[KitsuneLab] > [WARNING]   → INSTALL_CSS (boolean)
-[KitsuneLab] > [WARNING]   → INSTALL_SWIFTLY (boolean)
-[KitsuneLab] > [WARNING]   → INSTALL_MODSHARP (boolean)
-```
+**ModSharp 와 함께 쓸 수 있는 것은?**
+MetaMod 뿐입니다.
 
-**Migration Steps:**
+**업데이트가 플러그인을 깨뜨릴 수 있나요?**
+그렇습니다. 큰 업데이트에는 호환성이 깨지는 변경이 있습니다. 테스트 서버에서 먼저 확인하세요.
 
-1. Download latest egg JSON from GitHub
-2. Re-import egg in Pterodactyl panel
-3. Configure new boolean variables to match your current setup:
-   - Old: `ADDON_SELECTION="Metamod + CounterStrikeSharp"`
-   - New: `INSTALL_METAMOD=1` + `INSTALL_CSS=1`
-4. Restart server
-5. Verify frameworks load correctly
+**되돌릴 수 있나요?**
+직접 옛 버전을 설치하고 그 프레임워크의 자동업데이트를 끄면 됩니다.
 
-**Backwards Compatibility:**
+**MetaMod 만 갱신하고 CSS 는 그대로 두려면?**
+CSS 를 끄고 MetaMod 만 켜 두세요.
 
-The old `ADDON_SELECTION` variable still works temporarily:
+**베타도 받을 수 있나요?**
+`PRERELEASE=1` 로 두면 받습니다.
 
-| Old Value                          | New Equivalent                      |
-| ---------------------------------- | ----------------------------------- |
-| `Metamod Only`                     | `INSTALL_METAMOD=1`                 |
-| `Metamod + CounterStrikeSharp`     | `INSTALL_METAMOD=1` + `INSTALL_CSS=1` |
-| `SwiftlyS2`                        | `INSTALL_SWIFTLY=1`                 |
-| `ModSharp`                         | `INSTALL_MODSHARP=1`                |
+**GitHub 이 죽으면요?**
+갱신은 실패하지만 서버는 그대로 뜹니다. 다음 재시작에 다시 시도합니다.
 
-This compatibility will be removed in the next major update!
+**내가 쓰는 플러그인도 자동으로 갱신할 수 있나요?**
+됩니다. [서드파티 플러그인 자동업데이트](plugin-updater.md) 를 보세요.
 
-## Best Practices
+**버전은 어디에 기록되나요?**
+프레임워크는 `/home/container/egg/versions.txt`, 서드파티 플러그인은 `/home/container/egg/plugin-versions.txt` 입니다.
 
-1. **Test updates** on dev server before production
-2. **Backup plugins** before enabling auto-updates
-3. **Monitor changelogs** for breaking changes
-4. **Use multi-framework wisely** → Test compatibility between frameworks
-5. **Keep MetaMod updated** → Required by CSS
-6. **Check plugin compatibility** after updates
-7. **Use stable releases** in production
-8. **Enable only needed frameworks** → Reduces startup time
+**SwiftlyS2 에 MetaMod 가 필요한가요?**
+아니요. 단독으로 돕니다.
 
-## FAQ
+## 함께 보기
 
-**Q: Can I use CSS and SwiftlyS2 together?**
-A: Yes! They are compatible frameworks and can coexist.
+- [서드파티 플러그인 자동업데이트](plugin-updater.md)
+- [VPK 동기화와 중앙 업데이트](vpk-sync.md)
+- [설정 파일](../configuration/configuration-files.md)
+- [소스에서 빌드하기](../advanced/building.md)
 
-**Q: Can I use CSS and ModSharp together?**
-A: No. ModSharp is incompatible with CSS. If ModSharp is enabled, CSS will be auto-disabled with a warning message.
+## 도움 요청
 
-**Q: Can I use SwiftlyS2 and ModSharp together?**
-A: No. ModSharp is incompatible with SwiftlyS2. If ModSharp is enabled, SwiftlyS2 will be auto-disabled with a warning message.
-
-**Q: What frameworks are compatible with ModSharp?**
-A: ModSharp is only compatible with MetaMod. It cannot run alongside CSS or SwiftlyS2.
-
-**Q: Will updates break my plugins?**
-A: Possibly. Major updates can have breaking changes. Test on dev server first.
-
-**Q: Can I rollback an update?**
-A: Yes, manually install older version and toggle off auto-updates for that framework.
-
-**Q: How do I update only MetaMod, not CSS?**
-A: Toggle off CSS checkbox, keep MetaMod enabled.
-
-**Q: Are beta versions supported?**
-A: No, only stable releases from official repos.
-
-**Q: What if GitHub is down?**
-A: Updates will fail, but server will start anyway. Updates will work on next restart.
-
-**Q: Can I auto-update custom plugins?**
-A: Not built-in. You'll need to modify update scripts or manage them manually.
-
-**Q: Where are versions stored?**
-A: In `/home/container/egg/versions.txt` (accessible via FTP)
-
-**Q: Does SwiftlyS2 require MetaMod?**
-A: No! SwiftlyS2 v2 is standalone and doesn't require MetaMod.
-
-**Q: Can I enable all 4 frameworks simultaneously?**
-A: No. ModSharp is incompatible with CSS and SwiftlyS2. Maximum 3 frameworks simultaneously: MetaMod + CSS + SwiftlyS2. If you enable ModSharp with CSS/SwiftlyS2, ModSharp will be auto-disabled with a warning.
-
-## Related Documentation
-
-- [VPK Sync & Centralized Updates](vpk-sync.md) → Automatic CS2 updates and server restarts
-- [Configuration Files](../configuration/configuration-files.md) → All configuration options
-- [Building from Source](../advanced/building.md) → Customize update logic
-
-## Support
-
-Having update issues?
-
-- [Report Issue](https://github.com/K4ryuu/CS2-Egg/issues)
-- [Troubleshooting Guide](../advanced/troubleshooting.md)
+- [이슈 열기](https://github.com/CS2KR/cs2-egg/issues/new)
+- [문제 해결](../advanced/troubleshooting.md)

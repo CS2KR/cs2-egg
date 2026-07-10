@@ -28,25 +28,23 @@ headline()    {
 }
 
 usage() {
-    echo -e "${BOLD}KitsuneLab CS2 Docker Image Builder${RESET}"
+    echo -e "${BOLD}CS2.KR CS2 Docker 이미지 빌더${RESET}"
     echo -e ""
-    echo -e "${BOLD}Usage:${RESET}"
-    echo -e "    ./build.sh [TAG] [options]"
+    echo -e "${BOLD}사용법:${RESET}"
+    echo -e "    ./build.sh [태그] [옵션]"
     echo -e ""
-    echo -e "${BOLD}Positional:${RESET}"
-    echo -e "    TAG                 Docker tag to use (default: dev)"
+    echo -e "${BOLD}위치 인자:${RESET}"
+    echo -e "    태그                쓸 Docker 태그 (기본: dev)"
     echo -e ""
-    echo -e "${BOLD}Options:${RESET}"
-    echo -e "    -t, --tag TAG       Explicitly set the tag (overrides positional)"
-    echo -e "    -d, --dockerhub     Push the image to Docker Hub after successful build"
-    echo -e "    -g, --ghcr          Push the image to GitHub Container Registry (ghcr.io)"
-    echo -e "    -a, --all           Push the image to both Docker Hub and GHCR"
-    echo -e "    -h, --help          Show this help and exit"
+    echo -e "${BOLD}옵션:${RESET}"
+    echo -e "    -t, --tag 태그      태그를 명시 (위치 인자보다 우선)"
+    echo -e "    -g, --ghcr          빌드 뒤 ghcr.io 로 올린다 (-P, --publish 도 같음)"
+    echo -e "    -h, --help          도움말"
     echo -e ""
     echo -e "${BOLD}Examples:${RESET}"
     echo -e "    ./build.sh                    # build :dev"
     echo -e "    ./build.sh release            # build :release"
-    echo -e "    ./build.sh -t 1.2.3 -d        # build :1.2.3 and push to Docker Hub"
+    echo -e "    ./build.sh -t 1.2.3 -g        # :1.2.3 로 빌드하고 GHCR 로 올린다"
     echo -e "    ./build.sh -t 1.2.3 -g        # build :1.2.3 and push to GHCR"
     echo -e "    ./build.sh -t 1.2.3 -a        # build :1.2.3 and push to both registries"
 }
@@ -55,7 +53,6 @@ usage() {
 # Parse arguments
 # ---------------------------------------------
 TAG="dev"
-PUBLISH_DOCKERHUB=false
 PUBLISH_GHCR=false
 
 POSITIONAL_TAG=""
@@ -66,14 +63,8 @@ while [[ $# -gt 0 ]]; do
         -t|--tag)
             [[ $# -lt 2 ]] && { log_error "Missing value for $1"; exit 1; }
             TAG="$2"; shift 2 ;;
-        -d|--dockerhub)
-            PUBLISH_DOCKERHUB=true; shift ;;
-        -g|--ghcr)
+        -g|--ghcr|-P|--publish)
             PUBLISH_GHCR=true; shift ;;
-        -a|--all)
-            PUBLISH_DOCKERHUB=true
-            PUBLISH_GHCR=true
-            shift ;;
         --)
             shift; break ;;
         -*)
@@ -93,20 +84,15 @@ if [[ -n "$POSITIONAL_TAG" ]]; then
     TAG="$POSITIONAL_TAG"
 fi
 
-# Docker Hub configuration
-DOCKERHUB_IMAGE="sples1/k4ryuu-cs2"
-DOCKERHUB_FULL="${DOCKERHUB_IMAGE}:${TAG}"
-
-# GitHub Container Registry configuration
-# Note: GHCR requires lowercase repository names
-GITHUB_REPO="k4ryuu/cs2-egg"
+# GitHub Container Registry 만 쓴다. GHCR 은 소문자 저장소 이름을 요구한다.
+GITHUB_REPO="cs2kr/cs2-egg"
 GHCR_IMAGE="ghcr.io/${GITHUB_REPO}"
 GHCR_FULL="${GHCR_IMAGE}:${TAG}"
 
-# Primary build target (Docker Hub image)
-FULL_IMAGE="${DOCKERHUB_FULL}"
+# 기본 빌드 대상
+FULL_IMAGE="${GHCR_FULL}"
 
-headline "KitsuneLab CS2 Docker Image Builder" "Image: ${BOLD}${FULL_IMAGE}${RESET}"
+headline "CS2.KR CS2 Docker 이미지 빌더" "이미지: ${BOLD}${FULL_IMAGE}${RESET}"
 
 # ---------------------------------------------
 # Pre-flight checks
@@ -269,13 +255,8 @@ ghcr_login() {
 # ---------------------------------------------
 # Publish (optional)
 # ---------------------------------------------
-if [[ "$PUBLISH_DOCKERHUB" == true ]] || [[ "$PUBLISH_GHCR" == true ]]; then
+if [[ "$PUBLISH_GHCR" == true ]]; then
     section "Publishing image"
-
-    # Tag for GHCR if needed (silently)
-    if [[ "$PUBLISH_GHCR" == true ]]; then
-        docker tag "${DOCKERHUB_FULL}" "${GHCR_FULL}"
-    fi
 
     # Authenticate to GHCR if needed (before any pushing)
     GHCR_NEW_LOGIN=false
@@ -293,11 +274,6 @@ if [[ "$PUBLISH_DOCKERHUB" == true ]] || [[ "$PUBLISH_GHCR" == true ]]; then
         fi
     fi
 
-    # Push to Docker Hub
-    if [[ "$PUBLISH_DOCKERHUB" == true ]]; then
-        run_with_spinner "Pushing to Docker Hub" docker push "${DOCKERHUB_FULL}"
-    fi
-
     # Push to GHCR
     if [[ "$PUBLISH_GHCR" == true ]]; then
         run_with_spinner "Pushing to GHCR" docker push "${GHCR_FULL}"
@@ -308,10 +284,9 @@ if [[ "$PUBLISH_DOCKERHUB" == true ]] || [[ "$PUBLISH_GHCR" == true ]]; then
         log_info "Credentials saved to: ${HOME}/.docker/config.json"
     fi
 else
-    section "Next steps"
-    echo -e "To push to Docker Hub, run:\n  ${BOLD}docker push ${DOCKERHUB_FULL}${RESET}"
-    echo -e "\nTo push to GitHub Container Registry, run:\n  ${BOLD}docker push ${GHCR_FULL}${RESET}"
-    echo -e "\n${DIM}Tip: Use -d for Docker Hub, -g for GHCR, or -a for both${RESET}"
+    section "다음 단계"
+    echo -e "GHCR 로 올리려면:\n  ${BOLD}docker push ${GHCR_FULL}${RESET}"
+    echo -e "\n${DIM}팁: 빌드하면서 바로 올리려면 -g (또는 -P)${RESET}"
 fi
 
 exit 0

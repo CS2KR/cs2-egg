@@ -2,29 +2,28 @@
 icon: download
 ---
 
-# Install & Apply
+# 설치와 적용
 
-## Installation
+## 설치
 
-1. Download egg from the [GitHub repository](../../pterodactyl/kitsunelab-cs2-egg.json).
-2. Import into your Pterodactyl nest of choice. You can do this by navigating to the Admin section of your Pterodactyl panel, "Nests" under "Service Management", and clicking "Import Egg".
+1. 저장소에서 [egg 파일](../../pterodactyl/cs2kr-cs2-egg.json)을 내려받습니다.
+2. Pterodactyl 패널의 원하는 Nest 로 import 합니다. 관리자 화면 → "Service Management" 의 "Nests" → "Import Egg" 순서입니다.
 
-## Applying the Egg to existing server
+## 이미 있는 서버에 egg 적용하기
 
-1. Navigate to the "Servers" page on the Admin section of pterodactyl.
-2. Select the server that you want to apply the egg to.
-3. Navigate to "Startup" tab.
-4. Set the <mark style="color:purple;">**Nest**</mark> to the one that contains the Egg.
-5. Set the <mark style="color:purple;">**Egg**</mark> to <mark style="color:yellow;">**KitsuneLab CS2 Egg @ K4ryuu**</mark>.
-6. Check <mark style="color:purple;">**Skip Egg Install Script**</mark> in order to keep your files safe.
-7. Set the <mark style="color:purple;">**Image**</mark> to the selected version of the Egg.
-8. Save the modifications.
+1. Pterodactyl 관리자 화면의 "Servers" 로 갑니다.
+2. egg 를 적용할 서버를 고릅니다.
+3. "Startup" 탭으로 갑니다.
+4. <mark style="color:purple;">**Nest**</mark> 를 egg 가 들어 있는 Nest 로 지정합니다.
+5. <mark style="color:purple;">**Egg**</mark> 를 <mark style="color:yellow;">**CS2.KR CS2 Egg**</mark> 로 지정합니다.
+6. 파일이 지워지지 않도록 <mark style="color:purple;">**Skip Egg Install Script**</mark> 를 체크합니다.
+7. <mark style="color:purple;">**Image**</mark> 를 원하는 egg 이미지로 지정합니다.
+8. 저장합니다.
 
-## Installing new Server with the Egg
+## 새 서버를 이 egg 로 만들기
 
-1. On the "New Server" page scroll down until you see <mark style="color:purple;">**Nest Configuration**</mark>.
-2. Set the <mark style="color:purple;">**Nest**</mark> to the one that contains the Egg.
-3. Set the <mark style="color:purple;">**Egg**</mark> to <mark style="color:yellow;">**KitsuneLab CS2 Egg @ K4ryuu**</mark>.
-4. Set the <mark style="color:purple;">**Docker Image**</mark> to the selected version of the Egg.
-5. Set the other values as you want and then create the server.
-
+1. "New Server" 화면에서 <mark style="color:purple;">**Nest Configuration**</mark> 이 보일 때까지 내립니다.
+2. <mark style="color:purple;">**Nest**</mark> 를 egg 가 들어 있는 Nest 로 지정합니다.
+3. <mark style="color:purple;">**Egg**</mark> 를 <mark style="color:yellow;">**CS2.KR CS2 Egg**</mark> 로 지정합니다.
+4. <mark style="color:purple;">**Docker Image**</mark> 를 원하는 egg 이미지로 지정합니다.
+5. 나머지 값을 채우고 서버를 만듭니다.

@@ -1,435 +1,376 @@
-# Troubleshooting
+# 문제 해결
 
-Common issues and their solutions.
+자주 겪는 문제와 해결 방법입니다.
 
-## Installation Issues
+## 설치
 
-### Server Won't Start After Installation
+### 설치 뒤 서버가 뜨지 않을 때
 
-**Symptoms**: Server stops immediately after starting, or shows error in console.
+**증상**: 시작하자마자 멈추거나 콘솔에 에러가 납니다.
 
-**Solutions**:
+1. 디스크 여유를 확인하세요 (40GB 이상 권장).
+2. Docker 이미지를 제대로 받았는지 확인하세요.
+3. 콘솔에 SteamCMD 에러가 없는지 보세요.
+4. 포트가 이미 쓰이고 있지 않은지 확인하세요.
 
-1. Check if you have enough disk space (40GB+ recommended)
-2. Verify Docker image pulled successfully
-3. Check console for SteamCMD errors
-4. Ensure ports are not already in use
+### SteamCMD 다운로드 실패
 
-### SteamCMD Download Fails
+**오류**: `Failed to download SteamCMD` 또는 `Connection timeout`
 
-**Error**: `Failed to download SteamCMD` or `Connection timeout`
+1. 노드의 인터넷 연결을 확인하세요.
+2. 방화벽이 Steam CDN 을 막고 있지 않은지 확인하세요.
+3. Steam 상태를 확인하세요 — https://steamstat.us/
+4. 서버를 다시 시작해 보세요.
 
-**Solutions**:
+### 종료 코드 8 — 연결 오류
 
-1. Check your node's internet connection
-2. Verify firewall isn't blocking Steam CDN
-3. Check if Steam servers are up: https://steamstat.us/
-4. Try restarting the server
+**오류**: `SteamCMD failed with exit code 8` ([KL-STM-01](error-codes.md#kl-stm-01))
 
-### Exit Code 8 - Connection Error
+1. Steam 서버까지 네트워크가 닿는지 확인하세요.
+2. DNS 가 제대로 도는지 확인하세요.
+3. 디스크 여유를 확인하세요 (30~40GB 필요).
+4. VPN·프록시를 쓰고 있다면 끄세요.
+5. 몇 분 뒤 다시 시도하세요 (Steam 쪽 일시적 문제일 수 있습니다).
 
-**Error**: `SteamCMD failed with exit code 8`
+## 중앙 업데이트 스크립트
 
-**Solutions**:
+### 스크립트가 돌지 않을 때
 
-1. Check network connectivity to Steam servers
-2. Verify DNS is working properly
-3. Check available disk space (need 30-40GB free)
-4. Disable VPN/proxy if using one
-5. Wait a few minutes and try again (temporary Steam issue)
+- [ ] 실행 권한이 있나요? `chmod +x /usr/local/bin/update-cs2-centralized.sh`
+- [ ] Docker 데몬이 돌고 있고 접근되나요?
+- [ ] cron 이 등록되어 있나요? `cat /etc/cron.d/cs2-update`
+- [ ] 스크립트 상단의 `CS2_DIR` 경로가 맞나요?
 
-## Centralized Update Script Issues
-
-### Script Not Running
-
-**Problem**: Centralized update script (`misc/update-cs2-centralized.sh`) not running.
-
-**Checklist**:
-
-- [ ] Script has execute permissions: `chmod +x misc/update-cs2-centralized.sh`
-- [ ] Docker daemon is running and accessible
-- [ ] Script is configured in cron (if using auto-updates)
-- [ ] VPK Sync paths are correct in script configuration
-
-**Test manual run**:
+**수동으로 시험**
 
 ```bash
-cd /path/to/CS2-Egg
-./misc/update-cs2-centralized.sh
+/usr/local/bin/update-cs2-centralized.sh --simulate
 ```
 
-**Check script logs**:
+**로그 보기**
 
 ```bash
-# Script outputs detailed logs during execution
-# Look for errors in: SteamCMD, Docker commands, file permissions
+tail -f /var/log/cs2-update.log
+journalctl -u cs2-vpk-daemon -f
 ```
 
-### Lock File Conflicts
+### 잠금 파일 충돌
 
-**Error**: `Another instance is running (lockfile exists)`
+**오류**: `Another instance is running (lockfile exists)`
 
-**Normal behavior**: Lock conflicts during cron execution are normal and prevent overlapping updates.
+**정상 동작입니다.** cron 이 겹쳐 도는 것을 막습니다.
 
-**Solutions**:
-
-1. Wait for current update to complete (check `docker ps` for update activity)
-2. Only remove lock if script is truly stuck (not running for 30+ minutes):
+1. 지금 도는 업데이트가 끝나기를 기다리세요.
+2. 30분 넘게 멈춰 있는 게 확실할 때만 지우세요.
    ```bash
-   rm /tmp/cs2-update.lock
+   rm /var/lock/cs2-update.lock
    ```
-3. Check for hung Docker operations: `docker ps -a`
+3. 멈춘 Docker 작업이 없는지 확인하세요. `docker ps -a`
 
-### Docker Container Not Restarting
+### 컨테이너가 재시작되지 않을 때
 
-**Problem**: CS2 update completed but servers not restarting.
+**증상**: CS2 업데이트는 끝났는데 서버가 재시작되지 않습니다.
 
-**Checklist**:
+가장 흔한 원인은 **`SERVER_IMAGE` 가 실제 컨테이너 이미지와 다른 것**입니다. 목록에 없는 이미지의
+컨테이너는 스크립트에도 데몬에도 보이지 않아, 파일도 밀어 넣지 않고 재시작도 하지 않습니다.
+설치 마법사는 이 값을 묻지 않으므로 직접 확인해야 합니다.
 
-- [ ] `AUTO_RESTART_SERVERS="true"` in script configuration
-- [ ] Docker image name matches running containers
-- [ ] Docker daemon has permission to restart containers
-- [ ] Containers are using VPK Sync image (docker.io/sples1/k4ryuu-cs2)
+- [ ] `AUTO_RESTART_SERVERS="true"` 인가요?
+- [ ] `SERVER_IMAGE` 가 돌고 있는 컨테이너의 이미지와 일치하나요?
+- [ ] Docker 데몬에 컨테이너를 재시작할 권한이 있나요?
 
-**Debug**:
+**확인**
 
 ```bash
-# Check which containers would be restarted
-docker ps --format "{{.Names}}\t{{.Image}}" | grep "sples1/k4ryuu-cs2"
+# 지금 돌고 있는 컨테이너의 이미지
+docker ps --format "{{.Names}}\t{{.Image}}"
 
-# Manually restart a container
-docker restart <container_name>
+# 스크립트가 찾는 이미지
+grep '^SERVER_IMAGE=' /usr/local/bin/update-cs2-centralized.sh
+
+# 둘이 다르면 스크립트를 고친다
+nano /usr/local/bin/update-cs2-centralized.sh
 ```
 
-### SteamCMD Update Failures
+> 이 egg 의 이미지는 `ghcr.io/cs2kr/cs2-egg` 입니다. `ghcr.io/cs2kr/csgo-egg` (CS:GO 서버용)와는
+> 다른 이미지이니 섞지 마세요.
 
-**Error**: SteamCMD validation or update failures
+### SteamCMD 업데이트 실패
 
-**Solutions**:
-
-1. Set `VALIDATE_INSTALL="false"` in script (faster, use for regular updates)
-2. Enable validation only for troubleshooting: `VALIDATE_INSTALL="true"`
-3. Check available disk space (need 60-70GB free)
-4. Verify network connectivity to Steam CDN
-5. Re-run script with validation enabled to repair installation
-
-## Auto-Updater Issues
-
-### MetaMod Won't Update
-
-**Problem**: MetaMod stays on old version.
-
-**Solutions**:
-
-1. Check `INSTALL_METAMOD` is set to `1` in Pterodactyl Startup tab
-2. Verify internet connectivity
-3. Check metamodsource.net website is accessible
-4. Manually check `/game/csgo/addons/metamod/` exists
-5. Review console logs for download errors
-6. Delete `/egg/versions.txt` and restart to force re-download
-
-### CounterStrikeSharp Won't Update
-
-**Problem**: CSS doesn't update or install.
-
-**Solutions**:
-
-1. Set `INSTALL_CSS` to `1` in Pterodactyl Startup tab
-2. MetaMod automatically enabled (it's a dependency) - check for warning message
-3. Check GitHub API isn't rate-limited
-4. Verify `/game/csgo/addons/counterstrikesharp/` directory
-5. Check console for download/extraction errors
-6. Delete `/egg/versions.txt` and restart to force re-download
-
-### SwiftlyS2 Won't Install
-
-**Problem**: SwiftlyS2 not working.
-
-**Solutions**:
-
-1. Set `INSTALL_SWIFTLY` to `1` in Pterodactyl Startup tab
-2. SwiftlyS2 v2 is standalone (no MetaMod required)
-3. Check GitHub releases are accessible (swiftly-solution/swiftlys2)
-4. Look for errors in console during startup
-5. Verify `/game/csgo/addons/swiftlys2/` directory exists
-
-### ModSharp Won't Install
-
-**Problem**: ModSharp not working.
-
-**Solutions**:
-
-1. Set `INSTALL_MODSHARP` to `1` in Pterodactyl Startup tab
-2. Check .NET 9 runtime installation succeeded (check logs)
-3. Verify GitHub releases accessible (Kxnrl/modsharp-public)
-4. Check `/game/sharp/` directory exists
-5. Review console for download/extraction errors
-
-## Console Filter Issues
-
-### Filter Not Working
-
-**Problem**: Messages still appear that should be filtered.
-
-**Solutions**:
-
-1. Verify `ENABLE_FILTER` is set to `1` in Pterodactyl startup
-2. Check `/egg/configs/console-filter.json` exists with proper patterns
-3. Verify filter patterns are correct (supports exact and contains matching)
-4. Check console for filter loading messages
-5. Edit patterns via FTP in `/egg/configs/console-filter.json`
-
-### Too Many Messages Filtered
-
-**Problem**: Important messages are being hidden.
-
-**Solutions**:
-
-1. Edit `/egg/configs/console-filter.json` via FTP
-2. Review your `patterns` array
-3. Use more specific patterns (prefix with `@` for exact match)
-4. Remove overly broad patterns
-5. Test changes by restarting server
-
-### Filter Configuration Not Loading
-
-**Problem**: Changes to filter config not applied.
-
-**Solutions**:
-
-1. Verify JSON syntax is valid (use JSONLint.com)
-2. Check file permissions on `/egg/configs/console-filter.json`
-3. Restart server after making changes
-4. Check logs for JSON parsing errors
-
-## Cleanup Issues
-
-### Files Not Being Cleaned
-
-**Problem**: Old files accumulating.
-
-**Solutions**:
-
-1. Verify `CLEANUP_ENABLED` is set to `1` in Pterodactyl startup
-2. Check `/egg/configs/cleanup.json` exists with proper intervals configured
-3. Verify cleanup intervals (in hours) match your file retention needs
-4. Check console for cleanup messages during startup
-5. Look for cleanup messages in logs
-
-### Important Files Deleted
-
-**Problem**: Cleaner removed files you wanted to keep.
-
-**Solutions**:
-
-1. Edit `/egg/configs/cleanup.json` via FTP
-2. Adjust interval values (in hours) to be more conservative
-3. Increase hours to keep files longer (e.g., 168 hours = 7 days)
-4. Disable cleanup: Set `CLEANUP_ENABLED=0` in Pterodactyl startup
-5. Restore from backups if needed
-
-## Logging Issues
-
-### Logs Not Being Created
-
-**Problem**: No log files in `/egg/logs/`.
-
-**Solutions**:
-
-1. Check `/egg/configs/logging.json` has `"file_enabled": true`
-2. Verify `/egg/logs/` directory exists and is writable
-3. Check for error messages during startup
-4. Logs are created on first write (may be delayed)
-5. Note: Logging is always loaded, no environment variable needed
-
-### Log Rotation Not Working
-
-**Problem**: Single log file growing too large.
-
-**Solutions**:
-
-1. Check `/egg/configs/logging.json` rotation settings:
-   ```json
-   "rotation": {
-     "max_size_mb": 100,
-     "max_files": 30,
-     "max_days": 7
-   }
+1. 평소에는 `VALIDATE_INSTALL="false"` 로 두세요 (빠릅니다).
+2. 문제를 고칠 때만 검사를 켜세요. 이번 실행에만 켜려면 `--validate` 를 붙입니다.
+   ```bash
+   /usr/local/bin/update-cs2-centralized.sh --validate
    ```
-2. Verify rotation logic runs (check startup logs)
-3. Ensure rotation limits are reasonable
-4. Check disk space availability
+3. 디스크 여유를 확인하세요 (60~70GB 필요).
+4. Steam CDN 까지 네트워크가 닿는지 확인하세요.
 
-### Too Many/Few Log Files
+### 스크립트가 엉뚱한 버전으로 바뀔 때
 
-**Problem**: Unexpected number of log files retained.
+`AUTO_UPDATE_SCRIPT="true"` 면 스크립트가 `GITHUB_REPO` 에서 자신을 갱신합니다. 이 값이 다른 저장소를
+가리키면 남의 스크립트로 덮어씁니다. `CS2KR/cs2-egg` 인지 확인하세요.
 
-**Solutions**:
+```bash
+grep '^GITHUB_REPO=' /usr/local/bin/update-cs2-centralized.sh
+```
 
-1. Edit `/egg/configs/logging.json` via FTP
-2. Adjust `max_files` (number of files) and `max_days` (age in days) under `logging` section
-3. Rotation deletes files when: size>max OR count>max OR age>max
-4. Set stricter limits if too many files (lower values = fewer files kept)
-5. Restart to apply new settings
+백업은 스크립트 옆의 `.script-backups/` 에 3개까지 남습니다.
 
-## Performance Issues
+## 프레임워크 자동업데이트
 
-### High CPU Usage
+### MetaMod 가 갱신되지 않을 때
 
-**Possible causes**:
+1. **Startup** 탭에서 `INSTALL_METAMOD` 가 `1` 인지 확인하세요.
+2. 인터넷 연결을 확인하세요.
+3. metamodsource.net 에 닿는지 확인하세요.
+4. `game/csgo/addons/metamod/` 가 있는지 확인하세요.
+5. 콘솔에 다운로드 에러가 없는지 보세요.
+6. `egg/versions.txt` 를 지우고 재시작해 강제로 다시 받게 하세요.
 
-- Server running on slow hardware
-- Many players online
-- Resource-intensive plugins
+### CounterStrikeSharp 가 갱신되지 않을 때
 
-**Solutions**:
+1. **Startup** 탭에서 `INSTALL_CSS` 를 `1` 로 두세요.
+2. MetaMod 는 전제 조건이라 자동으로 켜집니다. 경고 메시지를 확인하세요.
+3. GitHub API 한도에 걸리지 않았는지 확인하세요.
+4. `game/csgo/addons/counterstrikesharp/` 를 확인하세요.
+5. 콘솔의 다운로드·압축 해제 에러를 보세요.
+6. `egg/versions.txt` 를 지우고 재시작하세요.
 
-1. Disable unnecessary features (filter, logging if not needed)
-2. Upgrade server resources
-3. Optimize plugins
+### SwiftlyS2 가 설치되지 않을 때
 
-### High Memory Usage
+1. **Startup** 탭에서 `INSTALL_SWIFTLY` 를 `1` 로 두세요.
+2. SwiftlyS2 는 단독으로 돕니다 (MetaMod 불필요).
+3. GitHub 릴리스에 닿는지 확인하세요 (`swiftly-solution/swiftlys2`).
+4. 기동 로그의 에러를 보세요.
+5. `game/csgo/addons/swiftlys2/` 가 있는지 확인하세요.
 
-**Solutions**:
+### ModSharp 가 설치되지 않을 때
 
-1. Increase allocated RAM in Pterodactyl
-2. Check for memory leaks in plugins
-3. Monitor with `docker stats`
-4. Review log file sizes (old logs consuming memory)
+1. **Startup** 탭에서 `INSTALL_MODSHARP` 를 `1` 로 두세요.
+2. .NET 런타임 설치가 성공했는지 로그로 확인하세요.
+3. GitHub 릴리스에 닿는지 확인하세요 (`Kxnrl/modsharp-public`).
+4. `game/sharp/` 가 있는지 확인하세요.
+5. 콘솔의 다운로드·압축 해제 에러를 보세요.
 
-## Docker Issues
+> ModSharp 와 CounterStrikeSharp 를 함께 켜면 egg 는 **경고만** 하고 자동으로 꺼 주지 않습니다.
+> 플러그인이 이상하게 동작하면 하나만 켜세요.
 
-### Container Keeps Restarting
+## 서드파티 플러그인 자동업데이트
 
-**Symptoms**: Server starts, then stops, then starts again repeatedly.
+### 플러그인이 갱신되지 않을 때
 
-**Solutions**:
+1. `PLUGIN_UPDATE_ENABLED` 가 `1` 인지 확인하세요.
+2. `egg/configs/plugins.json` 에 그 플러그인이 있는지 확인하세요.
+3. `detect` 경로가 볼륨에 실제로 있는지 확인하세요. 없으면 **일부러 건너뜁니다** (없던 플러그인을
+   새로 깔지 않습니다).
+4. `enabled` 가 `false` 가 아닌지 확인하세요.
+5. 기동 로그에서 그 플러그인 이름이 찍힌 줄을 찾으세요.
 
-1. Check Docker logs: `docker logs <container_id>`
-2. Verify no port conflicts
-3. Check for errors in entrypoint script
-4. Ensure all required environment variables are set
+### GitHub 한도에 걸릴 때
 
-### Permission Denied Errors
+**오류**: `403` / `rate limit`
 
-**Error**: Various permission denied messages.
+비인증 요청은 IP 당 시간당 60회입니다. 여러 서버가 공인 IP 를 공유하면 금방 소진됩니다.
+`GITHUB_TOKEN` (권한 없는 fine-grained PAT) 을 넣으면 5000회/시간이 됩니다.
 
-**Solutions**:
+한도에 걸리면 업데이터는 **아무것도 건드리지 않고 멈춥니다.** 서버는 기존 플러그인으로 그대로 뜹니다.
 
-1. Verify container user has proper permissions
-2. Check Pterodactyl node configuration
-3. Ensure Docker is configured correctly
-4. Check `/egg/` directory permissions
-5. Verify SELinux/AppArmor isn't blocking
+자세한 내용은 [서드파티 플러그인 자동업데이트](../features/plugin-updater.md) 를 보세요.
 
-## Network Issues
+## 콘솔 필터
 
-### Can't Connect to Server
+### 필터가 동작하지 않을 때
 
-**Problem**: Server shows as online but can't connect.
+1. `ENABLE_FILTER` 가 `1` 인지 확인하세요.
+2. `egg/configs/console-filter.json` 이 있는지 확인하세요.
+3. 패턴이 맞는지 확인하세요. 패턴은 CS2 가 뱉는 **영문 원문**과 비교합니다. 번역하면 안 됩니다.
+4. `preview_mode` 를 켜서 무엇이 걸러지는지 확인하세요.
 
-**Checklist**:
+### 너무 많이 걸러질 때
 
-- [ ] Port 27015 (UDP) is allocated and open
-- [ ] Firewall allows UDP traffic
-- [ ] Server has valid GSLT token
-- [ ] Server is actually running (check console)
-- [ ] Correct IP:port combination
+1. `egg/configs/console-filter.json` 을 고칩니다.
+2. `patterns` 를 다시 보세요.
+3. 더 구체적으로 쓰세요. `@` 를 앞에 붙이면 줄 전체가 똑같을 때만 막습니다.
+4. 지나치게 넓은 패턴을 지우세요.
+5. 재시작해 확인하세요.
 
-### Server Not Appearing in Browser
+### 설정이 반영되지 않을 때
 
-**Solutions**:
+1. JSON 문법을 확인하세요. `jq -e . egg/configs/console-filter.json`
+2. 파일 권한을 확인하세요.
+3. 고친 뒤 재시작했나요?
 
-1. Set valid `STEAM_ACC` (GSLT token)
-2. Generate token: https://steamcommunity.com/dev/managegameservers
-3. Ensure server is public (not LAN only)
-4. Check Steam account is in good standing
+## 자동 정리
 
-## Logging Issues
+### 파일이 지워지지 않을 때
 
-### No Console Output
+1. `CLEANUP_ENABLED` 가 `1` 인지 확인하세요.
+2. `egg/configs/cleanup.json` 이 있는지 확인하세요.
+3. 규칙의 `enabled` 가 `true` 인지 확인하세요.
+4. `hours` 값이 파일 나이보다 작은지 확인하세요.
+5. 기동 로그의 정리 메시지를 보세요.
 
-**Problem**: Console shows nothing or minimal output.
+### 지우면 안 될 파일이 지워졌을 때
 
-**Solutions**:
+1. `egg/configs/cleanup.json` 을 고칩니다.
+2. `hours` 를 늘리세요 (예: `168` = 7일).
+3. 해당 규칙의 `enabled` 를 `false` 로 두세요.
+4. 아예 끄려면 `CLEANUP_ENABLED=0`.
+5. 필요하면 백업에서 되살리세요.
 
-1. Check if output is being filtered too aggressively
-2. Disable filter temporarily: `ENABLE_FILTER=0`
-3. Check `LOG_LEVEL` setting
-4. Verify Docker logs are working
+## 로그
 
-### Logs Too Verbose
+### 로그 파일이 생기지 않을 때
 
-**Problem**: Too many debug messages.
+1. `egg/configs/logging.json` 에 `"file_enabled": true` 가 있는지 확인하세요.
+2. `egg/logs/` 에 쓸 수 있는지 확인하세요.
+3. 기동 로그의 에러를 보세요.
+4. 첫 기록이 있을 때 만들어지므로 조금 늦을 수 있습니다.
+5. 로깅은 항상 읽히며 별도의 egg 변수가 필요 없습니다.
 
-**Solutions**:
+### 로그 회전이 안 될 때
 
-1. Change `LOG_LEVEL` from `DEBUG` to `INFO` or `WARNING`
-2. Disable `LOG_FILE_ENABLED` if not needed
-3. Adjust filter to hide debug messages
+`egg/configs/logging.json` 의 값을 확인하세요. 항목은 모두 `logging` 아래에 평평하게 놓입니다.
 
-## Getting More Help
+```json
+{
+  "logging": {
+    "console_level": "INFO",
+    "file_enabled": true,
+    "max_size_mb": 100,
+    "max_files": 30,
+    "max_days": 7
+  }
+}
+```
 
-### Before Asking for Help
+크기·개수·기간 중 **하나라도** 상한에 닿으면 오래된 것부터 지웁니다.
 
-1. [✓] Check this troubleshooting guide
-2. [✓] Search existing GitHub issues
-3. [✓] Check console logs for errors
-4. [✓] Verify your configuration
-5. [✓] Test with default settings
+### 콘솔에 아무것도 안 나올 때
 
-### When Reporting Issues
+1. 필터가 너무 많이 걸러내고 있지 않은지 보세요. 잠시 `ENABLE_FILTER=0` 으로 두고 확인하세요.
+2. `logging.json` 의 `console_level` 을 확인하세요. `DEBUG`, `INFO`, `WARNING`, `ERROR` 를 대문자로 씁니다.
+3. Docker 로그가 나오는지 확인하세요.
 
-Include:
+### 로그가 너무 많을 때
 
-- [ ] Egg version (dev/beta/main)
-- [ ] Docker image tag
-- [ ] Full error message from console
-- [ ] Relevant environment variables (hide sensitive data!)
-- [ ] Steps to reproduce
-- [ ] Server specifications
+`console_level` 을 `DEBUG` 에서 `INFO` 나 `WARNING` 으로 올리고, 필요 없으면 `file_enabled` 를 끄세요.
 
-### Where to Get Help
+## 성능
 
-- [GitHub Issues](https://github.com/K4ryuu/CS2-Egg/issues) - Bug reports and feature requests
-- [GitHub Discussions](https://github.com/K4ryuu/CS2-Egg/discussions) - Questions and community help
+### CPU 사용량이 높을 때
 
-## Common Error Messages
+원인은 대개 하드웨어, 접속자 수, 무거운 플러그인입니다.
 
-### "Segmentation fault"
+1. 안 쓰는 기능을 끄세요.
+2. 서버 자원을 늘리세요.
+3. 플러그인을 점검하세요.
 
-Usually a CS2 server crash, not related to the egg. Check CS2 server logs and plugins.
+### 메모리 사용량이 높을 때
 
-### "Connection to Steam servers successful"
+1. Pterodactyl 에서 할당 RAM 을 늘리세요.
+2. 플러그인의 메모리 누수를 확인하세요.
+3. `docker stats` 로 관찰하세요.
 
-This is GOOD! It means server started successfully.
+## Docker
 
-### "Failed to load plugin"
+### 컨테이너가 계속 재시작될 때
 
-Check plugin compatibility with current CS2 version and installed dependencies.
+1. `docker logs <container_id>` 를 보세요.
+2. 포트 충돌이 없는지 확인하세요.
+3. entrypoint 스크립트의 에러를 보세요.
+4. 필요한 환경변수가 모두 채워졌는지 확인하세요.
 
-### "Rate limit exceeded"
+### 권한 오류
 
-GitHub/Steam API rate limit. Increase check intervals or wait before retrying.
+1. 컨테이너 사용자의 권한을 확인하세요.
+2. Pterodactyl 노드 설정을 확인하세요.
+3. `egg/` 디렉터리 권한을 확인하세요.
+4. SELinux·AppArmor 가 막고 있지 않은지 확인하세요.
 
-## Emergency Recovery
+## 네트워크
 
-### Server Completely Broken
+### 서버에 접속되지 않을 때
 
-1. Stop the server
-2. Backup current files
-3. Set `SRCDS_VALIDATE=1` to force validation
-4. Restart server (will re-download game files)
-5. Restore custom configs after validation
+- [ ] 포트(UDP)가 할당되고 열려 있나요?
+- [ ] 방화벽이 UDP 를 허용하나요?
+- [ ] GSLT 토큰이 유효한가요?
+- [ ] 서버가 실제로 돌고 있나요?
+- [ ] IP:포트 조합이 맞나요?
 
-### Start from Scratch
+### 서버 브라우저에 안 보일 때
 
-1. Stop server
-2. Backup important files (configs, databases)
-3. Delete server files
-4. Reinstall from Pterodactyl panel
-5. Restore backed up files
+1. `STEAM_ACC` (GSLT 토큰) 를 넣으세요.
+2. 토큰 발급 — https://steamcommunity.com/dev/managegameservers
+3. LAN 전용이 아닌지 확인하세요.
+4. Steam 계정 상태를 확인하세요.
 
-## Still Having Issues?
+## 자주 보는 메시지
 
-[Create a GitHub Issue](https://github.com/K4ryuu/CS2-Egg/issues/new/choose) with all relevant information.
+### `Segmentation fault`
+
+대개 CS2 서버가 죽은 것이고 egg 와는 무관합니다. CS2 로그와 플러그인을 보세요.
+
+### `Connection to Steam servers successful`
+
+정상입니다. 서버가 잘 떴다는 뜻입니다.
+
+### `Failed to load plugin`
+
+플러그인이 지금의 CS2 버전, 그리고 설치된 의존 항목과 맞는지 확인하세요.
+
+### `Rate limit exceeded`
+
+GitHub 또는 Steam API 한도입니다. `GITHUB_TOKEN` 을 넣거나 기다렸다 다시 하세요.
+
+`KL-XXX-NN` 형태의 코드가 보이면 [에러 코드](error-codes.md) 를 보세요.
+
+## 긴급 복구
+
+### 서버가 완전히 망가졌을 때
+
+1. 서버를 정지합니다.
+2. 지금 파일을 백업합니다.
+3. `SRCDS_VALIDATE=1` 로 검사를 강제합니다.
+4. 재시작합니다 (게임 파일을 다시 받습니다).
+5. 검사가 끝나면 커스텀 설정을 되돌립니다.
+
+### 중앙 업데이트가 망가졌을 때
+
+설치 스크립트를 다시 돌리세요. 현재 값을 기본값으로 보여 주면서 동작하는 상태로 되돌립니다.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/CS2KR/cs2-egg/main/misc/install-cs2-update.sh -o /tmp/install-cs2-update.sh \
+  && sudo bash /tmp/install-cs2-update.sh
+```
+
+### 처음부터 다시
+
+1. 서버를 정지합니다.
+2. 중요한 파일(설정, DB)을 백업합니다.
+3. 서버 파일을 지웁니다.
+4. 패널에서 다시 설치합니다.
+5. 백업을 되돌립니다.
+
+## 도움 요청
+
+### 물어보기 전에
+
+1. 이 문서를 확인하세요.
+2. 이미 올라온 이슈를 검색하세요.
+3. 콘솔 로그의 에러를 확인하세요.
+4. 설정을 다시 보세요.
+5. 기본 설정으로 시험해 보세요.
+
+### 이슈를 올릴 때 함께 적을 것
+
+- [ ] egg 버전 / Docker 이미지 태그
+- [ ] 콘솔의 전체 에러 메시지
+- [ ] 관련 환경변수 (**토큰·비밀번호는 가리세요**)
+- [ ] 재현 방법
+- [ ] 서버 사양
+
+### 어디에
+
+- [이슈 열기](https://github.com/CS2KR/cs2-egg/issues/new)
+- [에러 코드](error-codes.md)

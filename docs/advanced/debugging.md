@@ -1,76 +1,76 @@
-# GDB Debugging
+# GDB 디버깅
 
-Remote debugging for CS2 server crash analysis and plugin development.
+CS2 서버의 크래시 분석과 플러그인 개발을 위한 원격 디버깅입니다.
 
-## Quick Setup
+## 빠른 설정
 
-### 1. Port Configuration
+### 1. 포트 설정
 
-Add **additional port** in Pterodactyl:
+Pterodactyl 에서 **추가 포트**를 할당합니다.
 
-- **Game**: `27015` (UDP)
-- **Debug**: `27016` (TCP)
+- **게임**: `27015` (UDP)
+- **디버그**: `27016` (TCP)
 
-Set environment variable in **Startup** tab:
+**Startup** 탭에서 환경변수를 설정합니다.
 
 ```
 GDB_DEBUG_PORT=27016
 ```
 
-### 2. Server Behavior
+### 2. 서버 동작
 
-**⚠️ IMPORTANT**: When GDB is enabled, server **locks on startup** until debugger connects!
+**⚠️ 중요**: GDB 를 켜면 디버거가 붙을 때까지 서버가 **기동 도중에 멈춥니다!**
 
-Console shows:
+콘솔에는 이렇게 나옵니다.
 
 ```
-[INFO] Starting GDB debugger on port 27016 (PID: 12345)
-[WARNING] The console may hang until you resume it through IDA Pro or GDB client
+CS2.KR | 정보   | GDB 모드: 서버가 포트 27016 의 gdbserver 아래에서 시작합니다
+CS2.KR | 경고   | 디버거가 접속할 때까지 서버가 기다립니다
 ```
 
-Server waits frozen - **this is normal**. Connect debugger to continue.
+서버가 멈춘 채로 있는 것이 **정상입니다.** 디버거를 붙이면 이어집니다.
 
-## Connecting with IDA Pro
+## IDA Pro 로 접속하기
 
 1. **Debugger → Attach → Remote GDB debugger**
-2. Enter server IP and port `27016`
-3. Resume the process
+2. 서버 IP 와 포트 `27016` 을 입력합니다.
+3. 프로세스를 재개(resume)합니다.
 
-Now you can:
+그러면 다음을 할 수 있습니다.
 
-- Set breakpoints (F2)
-- Step through code (F7/F8)
-- Inspect memory and variables
+- 중단점 설정 (F2)
+- 한 줄씩 실행 (F7/F8)
+- 메모리와 변수 확인
 
-## Troubleshooting
+## 문제 해결
 
-**Server frozen on startup?**
+**기동 도중에 서버가 멈춰 있어요.**
 
-- Normal behavior! Connect debugger and resume to continue.
+- 정상입니다. 디버거를 붙이고 재개하면 이어집니다.
 
-**Can't connect?**
+**접속이 안 돼요.**
 
-- Check port allocated in Pterodactyl
-- Verify firewall allows TCP on debug port
-- Check `/tmp/gdb.log` in container
+- Pterodactyl 에서 포트가 할당됐는지 확인하세요.
+- 방화벽이 디버그 포트의 TCP 를 허용하는지 확인하세요.
+- 컨테이너 안의 `/tmp/gdb.log` 를 확인하세요.
 
-**Can't stop the server with Stop button?**
+**Stop 버튼으로 서버가 안 멈춰요.**
 
-- The `quit` command and graceful shutdown do not work while GDB is attached
-- Use the **Kill** button in Pterodactyl to force stop the server
-- This is a Docker limitation with gdbserver signal handling
+- GDB 가 붙어 있는 동안에는 `quit` 명령과 정상 종료가 동작하지 않습니다.
+- Pterodactyl 의 **Kill** 버튼으로 강제 종료하세요.
+- gdbserver 의 시그널 처리와 Docker 가 맞물려 생기는 제약입니다.
 
-**Performance issues?**
+**성능이 떨어져요.**
 
-- Expected with debugging enabled
-- Only use on dev/test servers
+- 디버깅을 켜면 당연히 느려집니다.
+- 개발·테스트 서버에서만 쓰세요.
 
-## Security Warning
+## 보안 경고
 
-**⚠️ NEVER enable on production servers!**
+**⚠️ 운영 서버에서는 절대 켜지 마세요!**
 
-Debugging gives full process access:
+디버깅은 프로세스 전체에 대한 접근을 내줍니다.
 
-- Only use on development/testing
-- Firewall the debug port
-- Disable after debugging session
+- 개발·테스트 서버에서만 쓰세요.
+- 디버그 포트는 방화벽으로 막으세요.
+- 디버깅이 끝나면 반드시 끄세요.

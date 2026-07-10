@@ -1,153 +1,101 @@
-# KitsuneLab CS2 Egg Documentation
+# CS2.KR CS2 Egg 문서
 
-Welcome to the official documentation for the KitsuneLab CS2 Pterodactyl Egg! This comprehensive guide will help you install, configure, and use all features.
+[CS2.KR](https://cs2.kr) 이 쓰는 Pterodactyl CS2 egg 문서입니다. 설치·설정·기능을 모두 다룹니다.
 
-## Quick Start
+[K4ryuu/CS2-Egg](https://github.com/K4ryuu/CS2-Egg) (GPL-3.0) 를 기반으로 합니다. 원본과의 차이는 저장소 [README](../README.md) 를 보세요.
 
-New to this egg? Start here:
+## 처음이라면
 
-1. **[Installation Guide](getting-started/installation.md)** - Install the egg in Pterodactyl
+1. **[설치 안내](getting-started/installation.md)** — Pterodactyl 에 egg 를 넣습니다
+2. **[빠른 시작](getting-started/quickstart.md)** — 서버를 띄웁니다
+3. **[업데이트](getting-started/updating.md)** — egg·이미지·게임 파일을 최신으로 유지합니다
 
-2. **[Quick Start](getting-started/quickstart.md)** - Get your server running
+## 목차
 
-3. **[Updating Guide](getting-started/updating.md)** - Keep everything up to date
+### 시작하기
 
-## Table of Contents
+- [설치](getting-started/installation.md) — egg 를 넣고 서버에 적용하는 법
+- [빠른 시작](getting-started/quickstart.md) — 서버를 빨리 띄우기
+- [업데이트](getting-started/updating.md) — egg, Docker 이미지, 게임 파일 갱신
 
-### Getting Started
+### 기능
 
-- [Installation](getting-started/installation.md) - How to install and apply the egg
+- [서드파티 플러그인 자동업데이트](features/plugin-updater.md) — 기동 시 플러그인을 최신 릴리스로 (CS2.KR 이 더한 기능)
+- [VPK 동기화와 중앙 업데이트](features/vpk-sync.md) — 저장 공간 80% 절약 + CS2 자동 갱신
+- [프레임워크 자동업데이트](features/auto-updaters.md) — MetaMod·CounterStrikeSharp·SwiftlyS2·ModSharp
+- [자동 정리](features/cleanup.md) — 오래된 로그·데모·덤프 지우기
 
-- [Quick Start](getting-started/quickstart.md) - Get your server running quickly
+### 설정
 
-- [Updating](getting-started/updating.md) - Update the egg, Docker image, and server
+- [설정 파일](configuration/configuration-files.md) — JSON 기반 설정 체계
 
-### Features
+### 심화
 
-- [VPK Sync & Centralized Updates](features/vpk-sync.md) - 80% storage savings + automatic CS2 updates
+- [소스에서 빌드하기](advanced/building.md) — Docker 이미지 직접 만들기
+- [GDB 디버깅](advanced/debugging.md) — GDB·IDA Pro 로 원격 디버깅
+- [에러 코드](advanced/error-codes.md) — 로그의 `KL-XXX-NN` 코드 풀이
+- [문제 해결](advanced/troubleshooting.md) — 흔한 문제와 해법
 
-- [Auto-Updaters](features/auto-updaters.md) - Multi-framework support with independent toggles
+## 주요 기능
 
-### Configuration
+- **서드파티 플러그인 자동업데이트** — 기동 시 `egg/configs/plugins.json` 에 적힌 플러그인만 최신 릴리스로 (CS2.KR 이 더한 것)
+- **프레임워크 자동업데이트** — MetaMod, CounterStrikeSharp, SwiftlyS2, ModSharp
+- **자동 재시작** — CS2 업데이트를 감지해 서버를 다시 띄움
+- **VPK 동기화** — 게임 파일을 한곳에 두어 서버당 약 52GB 절약
+- **자동 정리** — JSON 규칙으로 오래된 파일 삭제
+- **색이 붙은 로그** — 회전(rotation) 지원
+- **콘솔 필터** — 패턴으로 원치 않는 메시지 차단
+- **토큰 없는 서버** — GSLT 없이도 기동
+- **유연함** — Pterodactyl 없이 Docker 단독으로도 동작
 
-- [Configuration Files](configuration/configuration-files.md) - JSON-based configuration system
+## 자주 하는 일
 
-### Advanced
+### 새 서버 만들기
 
-- [Building from Source](advanced/building.md) - Build your own Docker image
+1. [egg 파일 내려받기](https://github.com/CS2KR/cs2-egg/blob/main/pterodactyl/cs2kr-cs2-egg.json)
+2. Pterodactyl 에 import
+3. 그 egg 로 새 서버 생성
+4. 시작
 
-- [GDB Debugging](advanced/debugging.md) - Remote debugging with GDB and IDA Pro
+[설치 안내 →](getting-started/installation.md)
 
-- [Troubleshooting](advanced/troubleshooting.md) - Common issues and solutions
+### 자동 재시작 켜기
 
-## Key Features
+1. 중앙 CS2 파일을 위해 VPK 동기화를 설정합니다
+2. 중앙 업데이트 스크립트를 설정합니다
+3. cron 에 등록해 주기적으로 확인하게 합니다
+4. CS2 가 업데이트되면 서버가 알아서 다시 뜹니다
 
-This egg includes many powerful features:
+[VPK 동기화와 중앙 업데이트 →](features/vpk-sync.md)
 
-- **Auto-Restart** - Detect CS2 updates and restart automatically
-
-- **Auto-Updaters** - Keep MetaMod, CounterStrikeSharp, Swiftly, and ModSharp updated
-
-- **VPK Sync** - Save ~52GB per server with centralized files
-
-- **Junk Cleaner** - Automatic cleanup configured via JSON
-
-- **Colored Logs** - Enhanced console output with rotation
-
-- **Console Filter** - Pattern-based message filtering
-
-- **Tokenless Servers** - Run servers without GSLT token requirement
-
-- **Flexible** - Works with Pterodactyl or standalone Docker
-
-## Common Tasks
-
-### Install a New Server
-
-1. [Download the egg](https://github.com/K4ryuu/CS2-Egg/blob/main/pterodactyl/kitsunelab-cs2-egg.json)
-
-2. Import into Pterodactyl
-
-3. Create a new server with the egg
-
-4. Start and enjoy!
-
-[Full Installation Guide →](getting-started/installation.md)
-
-### Enable Auto-Restart
-
-1. Set up VPK Sync for centralized CS2 files
-
-2. Configure the centralized update script
-
-3. Add to cron for automatic checks
-
-4. Servers restart automatically on CS2 updates!
-
-[VPK Sync & Centralized Updates Guide →](features/vpk-sync.md)
-
-### Build Custom Image
+### 직접 이미지 빌드하기
 
 ```bash
-git clone https://github.com/K4ryuu/CS2-Egg.git
-cd CS2-Egg
+git clone https://github.com/CS2KR/cs2-egg.git
+cd cs2-egg
 ./build.sh my-tag
 docker push your-registry/your-image:my-tag
 ```
 
-[Building Guide →](advanced/building.md)
+[빌드 안내 →](advanced/building.md)
 
-## Quick Links
+## 바로가기
 
-- **[Download Egg](https://github.com/K4ryuu/CS2-Egg/blob/main/pterodactyl/kitsunelab-cs2-egg.json)**
+- **[egg 파일 내려받기](https://github.com/CS2KR/cs2-egg/blob/main/pterodactyl/cs2kr-cs2-egg.json)**
+- **[이슈 열기](https://github.com/CS2KR/cs2-egg/issues/new)**
 
-- **[Report Bug](https://github.com/K4ryuu/CS2-Egg/issues/new?assignees=KitsuneLab-Development&labels=bug&projects=&template=bug_report.md&title=%5BBUG%5D)**
+## 도움이 필요하다면
 
-- **[Request Feature](https://github.com/K4ryuu/CS2-Egg/issues/new?assignees=KitsuneLab-Development&labels=enhancement&projects=&template=feature_request.md&title=%5BREQ%5D)**
+1. [문제 해결](advanced/troubleshooting.md) 을 먼저 보세요.
+2. [에러 코드](advanced/error-codes.md) 에서 로그의 `KL-XXX-NN` 을 찾아보세요.
+3. 그래도 안 되면 [이슈](https://github.com/CS2KR/cs2-egg/issues/new)를 열어 주세요.
 
-- **[View Changelog](../CHANGELOG)**
+## 라이선스
 
-## Need Help?
+원본을 따라 GPL-3.0 입니다. [LICENSE.md](../LICENSE.md) 를 보세요.
 
-If you need assistance:
+## 만든 사람들
 
-1. Check the [Troubleshooting Guide](advanced/troubleshooting.md)
-
-2. Search existing [GitHub Issues](https://github.com/K4ryuu/CS2-Egg/issues)
-
-3. Ask in [GitHub Discussions](https://github.com/K4ryuu/CS2-Egg/discussions)
-
-4. Create a [new issue](https://github.com/K4ryuu/CS2-Egg/issues/new) if needed
-
-## Contributing
-
-Want to help improve this project?
-
-- Report bugs and suggest features
-
-- Improve documentation
-
-- Submit pull requests
-
-- Share your experience
-
-## License
-
-This project is licensed under the GPL-3.0 License - see the [LICENSE.md](../LICENSE.md) file for details.
-
-## Credits
-
-- **[1zc](https://github.com/1zc)** - Original [CS2-Pterodactyl](https://github.com/1zc/CS2-Pterodactyl) base image
-
-- **[Poggu](https://github.com/Poggicek)** - Console filter inspiration from [CleanerCS2](https://github.com/Source2ZE/CleanerCS2)
-
-- All [contributors](https://github.com/K4ryuu/CS2-Egg/graphs/contributors) who help improve this project
-
----
-
-<div align="center">
-  <p>Made with ♥ by <a href="https://github.com/K4ryuu">K4ryuu</a> @ <a href="https://kitsune-lab.com">KitsuneLab</a></p>
-  <p>
-    <a href="https://github.com/K4ryuu/CS2-Egg">⭐ Star on GitHub</a>
-  </p>
-</div>
+- **[K4ryuu](https://github.com/K4ryuu) @ KitsuneLab** — 이 egg 의 원저작자 ([K4ryuu/CS2-Egg](https://github.com/K4ryuu/CS2-Egg))
+- **[1zc](https://github.com/1zc)** — 바탕이 된 [CS2-Pterodactyl](https://github.com/1zc/CS2-Pterodactyl) 이미지
+- **[Poggu](https://github.com/Poggicek)** — [CleanerCS2](https://github.com/Source2ZE/CleanerCS2) 에서 가져온 콘솔 필터 아이디어

@@ -1,174 +1,183 @@
-# VPK Sync Feature
+# VPK 동기화
 
-Dramatically reduce storage and bandwidth by centralizing CS2 game files across all servers on a node.
+한 노드의 여러 CS2 서버가 게임 파일을 공유하게 해서 저장 공간과 대역폭을 크게 아낍니다.
 
-## Overview
+## 개요
 
-VPK Sync allows multiple CS2 servers to share game files from a single centralized location instead of each server maintaining its own complete copy.
+서버마다 게임 파일을 통째로 갖는 대신, 한곳에 둔 설치본을 함께 씁니다.
 
-**How It Works:**
+**동작 방식**
 
-1. A cron job keeps one centralized CS2 installation updated via SteamCMD
-2. After each update, the script pushes game files directly into each server's volume - no Pterodactyl/Pelican mounts or manual configuration required
-3. VPK files are shared via symlinks (default), hardlinks, or full copies depending on your `VPK_PUSH_METHOD` setting
-4. A daemon watches for new containers and pushes files instantly on first start
+1. cron 작업이 SteamCMD 로 중앙 CS2 설치본 하나를 최신으로 유지합니다.
+2. 갱신될 때마다 스크립트가 각 서버 볼륨에 게임 파일을 직접 밀어 넣습니다. Pterodactyl 의 Mount 설정이나 수동 구성이 필요 없습니다.
+3. VPK 파일은 `VPK_PUSH_METHOD` 설정에 따라 심볼릭 링크(기본), 하드링크, 또는 완전 복사로 공유됩니다.
+4. 데몬이 새 컨테이너를 감시하다가 처음 뜰 때 곧바로 파일을 밀어 넣습니다.
 
-> **No Pterodactyl/Pelican Panel modifications required.** The script works directly with Docker and Wings - no PR patches, no mount setup, no egg variable configuration.
+> **패널을 고칠 필요가 없습니다.** 스크립트는 Docker 와 Wings 를 직접 다룹니다. 패치도, Mount 설정도, egg 변수 설정도 필요 없습니다.
 
-## Startup Performance
+## 기동 속도
 
-With the centralized script and VPK sync, new server startup is near-instant:
+중앙 스크립트와 VPK 동기화를 쓰면 새 서버가 거의 즉시 뜹니다.
 
-| Step                                    | Time           |
-| --------------------------------------- | -------------- |
-| Daemon detects container start          | ~0s            |
-| Daemon mounts CS2_DIR into container    | 1-3s           |
-| Entrypoint detects VPKs, skips SteamCMD | ~0s            |
-| CS2 server process starts               | ~2s            |
-| **Total (new server, first boot)**      | **~5 seconds** |
+| 단계 | 시간 |
+| --- | --- |
+| 데몬이 컨테이너 기동을 감지 | 약 0초 |
+| 데몬이 CS2_DIR 을 컨테이너에 마운트 | 1~3초 |
+| entrypoint 가 VPK 를 발견하고 SteamCMD 를 건너뜀 | 약 0초 |
+| CS2 서버 프로세스 시작 | 약 2초 |
+| **합계 (새 서버 첫 기동)** | **약 5초** |
 
-This replaces what would otherwise be a 10-30 minute SteamCMD download on first boot.
+이게 없으면 첫 기동에 SteamCMD 다운로드로 10~30분이 걸립니다.
 
-## Storage Savings
+## 절약되는 용량
 
-| Servers | Without Sync | With Sync | Savings      |
-| ------- | ------------ | --------- | ------------ |
-| 1       | 55GB         | 55GB      | 0GB (0%)     |
-| 5       | 275GB        | 70GB      | 205GB (75%)  |
-| 10      | 550GB        | 85GB      | 465GB (85%)  |
-| 20      | 1.1TB        | 115GB     | 1025GB (86%) |
-| 50      | 2.75TB       | 205GB     | 2.6TB (87%)  |
+| 서버 수 | 동기화 없이 | 동기화 후 | 절약 |
+| --- | --- | --- | --- |
+| 1 | 55GB | 55GB | 0GB (0%) |
+| 5 | 275GB | 70GB | 205GB (75%) |
+| 10 | 550GB | 85GB | 465GB (85%) |
+| 20 | 1.1TB | 115GB | 1025GB (86%) |
+| 50 | 2.75TB | 205GB | 2.6TB (87%) |
 
-## Prerequisites
+## 준비물
 
-- Root access to the node
-- Docker (standard on Pterodactyl/Pelican nodes)
-- `rsync` - `apt-get install -y rsync`
-- ~56GB free storage for one complete CS2 installation
-- For `hardlink` mode: `CS2_DIR` and panel volumes must be on the same filesystem
+- 노드의 root 권한
+- Docker (Pterodactyl 노드에는 기본으로 있습니다)
+- `rsync` — `apt-get install -y rsync`
+- CS2 설치본 하나를 담을 약 56GB 의 여유 공간
+- `hardlink` 방식을 쓴다면 `CS2_DIR` 과 패널 볼륨이 같은 파일시스템에 있어야 합니다
 
-## Installation
+## 설치
 
-Run the installer as root - it handles everything:
+설치 스크립트를 root 로 실행하면 나머지는 알아서 합니다.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/K4ryuu/CS2-Egg/main/misc/install-cs2-update.sh -o /tmp/install-cs2-update.sh && sudo bash /tmp/install-cs2-update.sh
+curl -fsSL https://raw.githubusercontent.com/CS2KR/cs2-egg/main/misc/install-cs2-update.sh -o /tmp/install-cs2-update.sh && sudo bash /tmp/install-cs2-update.sh
 ```
 
-The installer will:
+설치 스크립트가 하는 일은 다음과 같습니다.
 
-1. Walk you through configuration (paths, push method, restart behavior)
-2. Download the update script to `/usr/local/bin/update-cs2-centralized.sh`
-3. Install and start the VPK push daemon as a systemd service
-4. Register a cron job that runs every minute (rate-limited by `UPDATE_CHECK_INTERVAL`)
+1. 설정(경로, 밀어 넣는 방식, 재시작 동작)을 물어봅니다.
+2. 업데이트 스크립트를 `/usr/local/bin/update-cs2-centralized.sh` 에 내려받습니다.
+3. VPK push 데몬을 systemd 서비스로 설치하고 시작합니다.
+4. 매분 도는 cron 을 등록합니다 (실제 실행 간격은 `UPDATE_CHECK_INTERVAL` 로 제한됩니다).
 
-After installation, edit the config section at the top of the script to adjust any settings:
+설치 뒤에는 스크립트 상단의 설정 부분을 고쳐 값을 바꿀 수 있습니다.
 
 ```bash
 nano /usr/local/bin/update-cs2-centralized.sh
 ```
 
-## Push Methods
+> **`SERVER_IMAGE` 은 마법사가 묻지 않습니다.** 기본값은 `ghcr.io/cs2kr/cs2-egg` 이며, 어떤 컨테이너에
+> 파일을 밀어 넣고 재시작할지를 이 값이 정합니다. 다른 이미지를 쓴다면 직접 고쳐야 합니다. 목록에 없는
+> 이미지의 컨테이너는 스크립트에도 데몬에도 보이지 않아, 아무 일도 일어나지 않습니다.
+> 스크립트가 자기 자신을 갱신할 때 이 값은 보존되므로, 한 번 잘못 두면 계속 잘못된 채로 남습니다.
+>
+> ```bash
+> docker ps --format "{{.Names}}\t{{.Image}}"          # 실제 컨테이너 이미지
+> grep '^SERVER_IMAGE=' /usr/local/bin/update-cs2-centralized.sh   # 스크립트가 찾는 이미지
+> ```
 
-| Method     | Panel disk usage | Writable       | Requirements                                |
-| ---------- | ---------------- | -------------- | ------------------------------------------- |
-| `symlink`  | ~0 per server    | No (read-only) | None - CS2_DIR auto-mounted into containers |
-| `hardlink` | ~53GB per server | No (read-only) | Same filesystem as CS2_DIR                  |
-| `copy`     | ~52GB per server | Yes            | None                                        |
-| `off`      | -                | -              | -                                           |
+## 밀어 넣는 방식
 
-**Symlink** (default) - symlinks from each server's volume to CS2_DIR. Panel sees near-zero disk usage. CS2_DIR is automatically bind-mounted read-only into each container so symlinks resolve correctly inside.
+| 방식 | 패널이 보는 디스크 사용량 | 쓰기 가능 | 조건 |
+| --- | --- | --- | --- |
+| `symlink` | 서버당 거의 0 | 불가 (읽기 전용) | 없음. CS2_DIR 이 컨테이너에 자동 마운트됩니다 |
+| `hardlink` | 서버당 약 53GB | 불가 (읽기 전용) | CS2_DIR 이 볼륨과 같은 파일시스템에 있어야 함 |
+| `copy` | 서버당 약 52GB | 가능 | 없음 |
+| `off` | — | — | — |
 
-**Hardlink** - no extra physical disk space, but panel disk quota counts the full VPK size (~53GB) per server. Requires CS2_DIR on the same filesystem as panel volumes.
+**symlink** (기본) — 각 서버 볼륨에서 CS2_DIR 로 심볼릭 링크를 겁니다. 패널이 보는 디스크 사용량이 거의 0 입니다. 컨테이너 안에서 링크가 풀리도록 CS2_DIR 이 읽기 전용으로 바인드 마운트됩니다.
 
-**Copy** - each server gets its own independent copy. Useful if servers need write access to game files.
+**hardlink** — 실제 디스크는 더 쓰지 않지만, 패널의 디스크 쿼터는 서버당 VPK 전체 용량(약 53GB)으로 셉니다. CS2_DIR 이 패널 볼륨과 같은 파일시스템에 있어야 합니다.
 
-## Quick Reference
+**copy** — 서버마다 독립된 사본을 갖습니다. 게임 파일에 써야 하는 경우에 씁니다.
+
+## 자주 쓰는 명령
 
 ```bash
-# Run update manually
-# If cron is currently running you'll get a lock error - wait a moment and retry
+# 수동으로 한 번 돌리기
+# cron 이 돌고 있으면 잠금 오류가 납니다. 잠시 뒤 다시 시도하세요.
 /usr/local/bin/update-cs2-centralized.sh
 
-# Test push and restart logic (skip SteamCMD download)
+# 밀어 넣기·재시작 로직만 시험 (SteamCMD 다운로드는 건너뜀)
 /usr/local/bin/update-cs2-centralized.sh --simulate
 
-# Daemon status
+# 데몬 상태
 systemctl status cs2-vpk-daemon
 
-# Daemon logs (live)
+# 데몬 로그 (실시간)
 journalctl -u cs2-vpk-daemon -f
 
-# Update logs
+# 업데이트 로그
 tail -f /var/log/cs2-update.log
 ```
 
-## Maintenance
+## 유지보수
 
-### Script Self-Update
+### 스크립트 자체 업데이트
 
-Enabled by default. The script checks GitHub for newer versions, preserves your configuration, validates syntax, and atomically replaces itself. Keeps last 3 backups in `.script-backups/`. Disable with `AUTO_UPDATE_SCRIPT="false"`.
+기본으로 켜져 있습니다. GitHub 에서 새 버전을 확인하고, 설정을 보존하고, 문법을 검사한 뒤 원자적으로 자신을 교체합니다. 백업 3개를 `.script-backups/` 에 남깁니다. 끄려면 `AUTO_UPDATE_SCRIPT="false"` 로 두세요.
 
-### Monitoring
+### 모니터링
 
 ```bash
 tail -f /var/log/cs2-update.log
 journalctl -u cs2-vpk-daemon --since "1 hour ago"
 ```
 
-## Troubleshooting
+## 문제 해결
 
-> The script automatically handles: SteamCMD installation, 32-bit library setup, permissions, Steam SDK libraries, and directory creation.
+> 스크립트가 알아서 처리하는 것들: SteamCMD 설치, 32비트 라이브러리 설정, 권한, Steam SDK 라이브러리, 디렉터리 생성.
 
-> **Something broken?** Re-run the installer - it resets config to working defaults while offering your current values as starting points:
+> **뭔가 망가졌다면?** 설치 스크립트를 다시 돌리세요. 현재 값을 기본값으로 제시하면서 동작하는 설정으로 되돌려 줍니다.
 >
 > ```bash
-> curl -fsSL https://raw.githubusercontent.com/K4ryuu/CS2-Egg/main/misc/install-cs2-update.sh -o /tmp/install-cs2-update.sh && sudo bash /tmp/install-cs2-update.sh
+> curl -fsSL https://raw.githubusercontent.com/CS2KR/cs2-egg/main/misc/install-cs2-update.sh -o /tmp/install-cs2-update.sh && sudo bash /tmp/install-cs2-update.sh
 > ```
 
-### Cross-Filesystem Hardlink Error
+### 파일시스템이 달라 하드링크가 안 될 때
 
-**Error:** `Cross-filesystem hardlink not possible for ptero-xxxx`
+**오류**: `Cross-filesystem hardlink not possible for ptero-xxxx`
 
-`CS2_DIR` and panel volumes are on different partitions.
+`CS2_DIR` 과 패널 볼륨이 서로 다른 파티션에 있습니다.
 
 ```bash
-# Check filesystems
+# 파일시스템 확인
 df -h /srv/cs2-shared
 df -h /var/lib/pterodactyl/volumes
-df -h /var/lib/pelican/volumes
 
-# Option A: move CS2_DIR onto the same partition as volumes
-# Option B: switch to copy mode - edit VPK_PUSH_METHOD="copy" in the script
+# 방법 A: CS2_DIR 을 볼륨과 같은 파티션으로 옮긴다
+# 방법 B: 스크립트에서 VPK_PUSH_METHOD="copy" 로 바꾼다
 ```
 
-### Cron Job Not Running
+### cron 이 안 돌 때
 
 ```bash
 systemctl status cron
 cat /etc/cron.d/cs2-update
-/usr/local/bin/update-cs2-centralized.sh  # test manually
+/usr/local/bin/update-cs2-centralized.sh  # 수동으로 시험
 ```
 
-## FAQ
+## 자주 묻는 것
 
-**Q: Do I need to modify Pterodactyl/Pelican Panel or apply any patches?**
-No. The script works directly with Docker and Wings.
+**패널을 고치거나 패치를 적용해야 하나요?**
+아니요. 스크립트는 Docker 와 Wings 를 직접 다룹니다.
 
-**Q: Do I need to configure anything on individual servers?**
-No. Files are pushed directly into each server's volume from the host.
+**서버마다 뭔가 설정해야 하나요?**
+아니요. 호스트에서 각 서버 볼륨으로 파일을 직접 밀어 넣습니다.
 
-**Q: What if the cron job fails?**
-Servers continue using existing files. The daemon still handles new containers. Run manually to trigger a push: `/usr/local/bin/update-cs2-centralized.sh --simulate`.
+**cron 이 실패하면요?**
+서버는 기존 파일로 계속 돕니다. 데몬은 새 컨테이너를 여전히 처리합니다. 수동으로 밀어 넣으려면 `/usr/local/bin/update-cs2-centralized.sh --simulate` 를 돌리세요.
 
-**Q: What's the difference between the cron job and the daemon?**
-The cron job handles CS2 updates and pushes to all existing servers. The daemon handles new servers - it reacts instantly when a container starts so game files are present before the startup script runs.
+**cron 과 데몬은 뭐가 다른가요?**
+cron 은 CS2 업데이트를 받아 이미 있는 모든 서버로 밀어 넣습니다. 데몬은 새 서버를 담당합니다. 컨테이너가 뜨는 순간 반응해서, 시작 스크립트가 돌기 전에 게임 파일을 준비합니다.
 
-**Q: Can I use VPK sync without the daemon?**
-Yes. Without the daemon, new servers receive files on the next cron cycle (~2 minutes). For most setups this is fine since CS2 startup takes longer than that anyway.
+**데몬 없이 VPK 동기화만 쓸 수 있나요?**
+됩니다. 데몬이 없으면 새 서버는 다음 cron 주기(약 2분)에 파일을 받습니다. CS2 기동이 그보다 오래 걸리므로 대부분은 문제가 없습니다.
 
-## Support
+## 링크
 
-- [Report Issue](https://github.com/K4ryuu/CS2-Egg/issues)
-- [View Update Script](https://github.com/K4ryuu/CS2-Egg/blob/main/misc/update-cs2-centralized.sh)
-- [View Installer](https://github.com/K4ryuu/CS2-Egg/blob/main/misc/install-cs2-update.sh)
+- [이슈 열기](https://github.com/CS2KR/cs2-egg/issues/new)
+- [업데이트 스크립트](https://github.com/CS2KR/cs2-egg/blob/main/misc/update-cs2-centralized.sh)
+- [설치 스크립트](https://github.com/CS2KR/cs2-egg/blob/main/misc/install-cs2-update.sh)

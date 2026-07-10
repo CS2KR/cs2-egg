@@ -1,41 +1,44 @@
-# Configuration Files
+# 설정 파일
 
-The KitsuneLab CS2 Egg uses JSON configuration files for easy, persistent customization.
+이 egg 는 JSON 설정 파일로 동작을 조절합니다. 서버 재시작과 업데이트를 거쳐도 남습니다.
 
-## Location
+## 위치
 
-All configuration files are stored in:
+모든 설정 파일은 여기 있습니다.
 
 ```
 /home/container/egg/configs/
 ```
 
-Files are automatically created on first startup with default values and detailed descriptions.
+첫 기동 때 기본값과 설명이 담긴 채로 자동 생성됩니다.
 
-## Configuration System
+## 어떻게 동작하는가
 
-### How It Works
+1. **기능을 켭니다** — Pterodactyl egg 변수로 (예: `ENABLE_FILTER=1`)
+2. **세부를 정합니다** — JSON 파일로 (패턴, 주기, 규칙 등)
+3. **FTP 로 고칩니다** — 모든 설정은 SFTP/FTP 로 접근할 수 있습니다
+4. **재시작하면 반영됩니다**
 
-1. **Enable features** via Pterodactyl egg variables (e.g., `ENABLE_FILTER=1`)
-2. **Configure details** via JSON files (e.g., API tokens, intervals, patterns)
-3. **Edit via FTP** - All configs are accessible through SFTP/FTP
-4. **Restart to apply** - Changes take effect on server restart
+각 파일에는 `_description` 배열이 들어 있어 항목의 뜻을 파일 안에서 바로 볼 수 있습니다.
 
-### Benefits
+## 설정 파일들
 
-- - **FTP Accessible** - Edit without panel access
-- - **Well Documented** - Each file includes `_description` with examples
-- - **Persistent** - Survives server restarts and updates
-- - **Type Safe** - JSON structure prevents configuration errors
-- - **Version Controlled** - Easy to backup and restore
+### `plugins.json`
 
-## Configuration Files
+**하는 일**: 기동할 때 갱신할 서드파티 플러그인 목록입니다. CS2.KR 이 더한 기능입니다.
+
+**켜기**: egg 변수 `PLUGIN_UPDATE_ENABLED=1` (기본값)
+
+여기 적히지 않은 플러그인은 손대지 않습니다. 자세한 형식과 원칙은
+[서드파티 플러그인 자동업데이트](../features/plugin-updater.md) 를 보세요.
+
+---
 
 ### `console-filter.json`
 
-**Purpose:** Filter unwanted console messages
+**하는 일**: 원치 않는 콘솔 메시지를 걸러냅니다.
 
-**Enable:** Set `ENABLE_FILTER=1` in Pterodactyl egg
+**켜기**: egg 변수 `ENABLE_FILTER=1`
 
 ```json
 {
@@ -44,14 +47,14 @@ Files are automatically created on first startup with default values and detaile
 }
 ```
 
-**Key Settings:**
+**항목**
 
-- `preview_mode` - Show what would be filtered (testing)
-- `patterns` - Array of patterns to filter
-  - `"@exact text"` - Exact match only
-  - `"contains this"` - Contains match (default)
+- `preview_mode` — 무엇이 걸러졌는지 디버그 로그에 남깁니다 (시험용)
+- `patterns` — 필터 패턴 목록
+  - `"@정확히 이 줄"` — 줄 전체가 똑같을 때만 막습니다
+  - `"이 문구 포함"` — 그 문구가 들어간 줄을 모두 막습니다 (기본)
 
-**Example Patterns:**
+**예**
 
 ```json
 {
@@ -59,23 +62,25 @@ Files are automatically created on first startup with default values and detaile
 }
 ```
 
-**Note:** `STEAM_ACC` (GSLT token) is automatically masked regardless of settings.
+패턴은 CS2 가 실제로 뱉는 영문 줄과 비교하므로 번역하면 안 됩니다.
+
+**참고**: `STEAM_ACC`(GSLT 토큰)는 설정과 무관하게 항상 가려집니다.
 
 ---
 
 ### `cleanup.json`
 
-**Purpose:** Automatic cleanup of old files — rule-based, user-extensible.
+**하는 일**: 오래된 파일을 규칙에 따라 지웁니다.
 
-**Enable:** Set `CLEANUP_ENABLED=1` in Pterodactyl egg.
+**켜기**: egg 변수 `CLEANUP_ENABLED=1`
 
 ```json
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "rules": [
     {
       "name": "demos",
-      "description": "SourceTV demo recordings",
+      "description": "SourceTV 데모 녹화 파일입니다.",
       "directories": ["./game/csgo"],
       "patterns": ["*.dem"],
       "hours": 168,
@@ -86,26 +91,26 @@ Files are automatically created on first startup with default values and detaile
 }
 ```
 
-**Rule fields:**
+**규칙 항목**
 
-- `name` - Stat category shown in log output
-- `directories` - Array of paths to search (relative to `/home/container` or absolute)
-- `patterns` - Array of filename globs (e.g. `*.dem`, `core.[0-9]*`)
-- `hours` - Delete files older than N hours (`0` = delete on every run)
-- `recursive` - `true` = walk subdirectories, `false` = only the directory root
-- `enabled` - `false` disables the rule without deleting it
+- `name` — 로그에 표시되는 분류 이름
+- `directories` — 찾아볼 경로 (`/home/container` 기준 상대경로 또는 절대경로)
+- `patterns` — 파일 이름 글롭 (예: `*.dem`, `core.[0-9]*`)
+- `hours` — 이 시간보다 오래된 파일을 지웁니다 (`0` 이면 매번)
+- `recursive` — `true` 면 하위 디렉터리까지
+- `enabled` — `false` 면 규칙을 지우지 않고 끕니다
 
-Default rules: `backup_rounds`, `demos`, `css_logs`, `swiftly_logs`, `accelerator_dumps`, `core_dumps`.
+기본 규칙: `backup_rounds`, `demos`, `css_logs`, `swiftly_logs`, `accelerator_dumps`, `core_dumps`.
 
-Full guide with custom rule examples → [features/cleanup.md](../features/cleanup.md).
+예시가 더 필요하면 → [features/cleanup.md](../features/cleanup.md)
 
 ---
 
 ### `logging.json`
 
-**Purpose:** Configure console output and daily log rotation
+**하는 일**: 콘솔 출력 수준과 파일 로그 회전을 정합니다.
 
-**Note:** Always loaded, no environment variable needed
+**참고**: 항상 읽히며 별도의 egg 변수가 필요 없습니다.
 
 ```json
 {
@@ -119,179 +124,162 @@ Full guide with custom rule examples → [features/cleanup.md](../features/clean
 }
 ```
 
-**Key Settings:**
+**항목**
 
-- `console_level` - Console verbosity: `DEBUG`, `INFO`, `WARNING`, `ERROR`
-- `file_enabled` - Save logs to `/home/container/egg/logs/`
-- `max_size_mb` - Max total log directory size (MB)
-- `max_files` - Max number of log files to keep
-- `max_days` - Max age of log files (days)
+- `console_level` — 콘솔에 찍을 최소 수준. `DEBUG`, `INFO`, `WARNING`, `ERROR` (대문자 그대로 씁니다)
+- `file_enabled` — `/home/container/egg/logs/` 에 파일로도 남길지
+- `max_size_mb` — 로그 디렉터리 전체 크기 상한 (MB)
+- `max_files` — 보관할 로그 파일 개수 상한
+- `max_days` — 로그 파일을 보관할 최대 일수
 
-**Log Rotation:**
+**로그 회전**
 
-- One file per day: `YYYY-MM-DD.log`
-- Automatically deleted when ANY limit is reached (size OR count OR age)
-- Location: `/home/container/egg/logs/`
+- 하루에 한 파일: `YYYY-MM-DD.log`
+- 크기·개수·기간 중 하나라도 상한에 닿으면 오래된 것부터 지웁니다
+- 위치: `/home/container/egg/logs/`
 
 ---
 
-## Hidden Egg Variables
+## 패널에 보이지 않는 egg 변수
 
-These variables are not visible in the Pterodactyl panel UI but can be configured by editing the egg JSON file.
+패널 UI 에 노출되지 않지만 egg JSON 을 고쳐 바꿀 수 있는 변수입니다.
 
 ### `PREFIX_TEXT`
 
-**Purpose:** Customize the log prefix text
+**하는 일**: 로그 앞에 붙는 이름을 바꿉니다.
 
-**Default:** `KitsuneLab`
+**기본값**: `CS2.KR`
 
-**How to Change:**
+**바꾸는 법**
 
-1. In Pterodactyl, go to **Admin → Nests → KitsuneLab CS2 Egg**
-2. Edit the egg JSON
-3. Find the `PREFIX_TEXT` variable
-4. Update the `default_value` field:
+1. Pterodactyl 에서 **Admin → Nests → CS2.KR CS2 Egg** 로 갑니다.
+2. **Variables** 탭에서 `PREFIX_TEXT` 를 찾습니다.
+3. `Default Value` 를 바꿉니다.
+4. 저장합니다.
+5. 이 egg 를 쓰는 모든 서버가 재시작 뒤 새 접두어를 씁니다.
 
-```json
-{
-  "name": "Log Prefix Text",
-  "env_variable": "PREFIX_TEXT",
-  "default_value": "MyServerName"
-}
-```
+**출력 예**
 
-5. **Save the egg**
-6. **Important:** All servers using this egg will use the new prefix after restart
+- 기본: `CS2.KR | 정보   | 서버를 시작합니다: ./game/cs2.sh`
+- 변경: `MyServer | 정보   | 서버를 시작합니다: ./game/cs2.sh`
 
-**Example Output:**
+색과 서식은 그대로이고 맨 앞의 이름만 바뀝니다.
 
-- Default: `[KitsuneLab] > Server starting...`
-- Custom: `[MyServerName] > Server starting...`
+---
 
-**Note:** The colors and formatting remain the same, only the text inside `[ ]` changes.
+### `GITHUB_TOKEN`
 
-**Why Update Default?** Updating the egg's default value changes the prefix for all servers using that egg, ensuring consistency across your infrastructure.
+**하는 일**: 서드파티 플러그인 자동업데이트가 GitHub 릴리스를 조회할 때 씁니다.
+
+**기본값**: 비어 있음
+
+비워 두면 IP 당 시간당 60회로 제한됩니다. 여러 서버가 공인 IP 를 공유하면 기동할 때 갱신이 실패합니다.
+**권한을 하나도 주지 않은** fine-grained PAT 면 충분합니다.
 
 ---
 
 ### `ALLOW_TOKENLESS`
 
-**Purpose:** Allow servers to run without a Steam Game Server Login Token (GSLT)
+**하는 일**: GSLT(Steam 게임 서버 로그인 토큰) 없이도 서버가 뜨게 합니다.
 
-**Default:** `0` (disabled)
+**기본값**: `0` (끔)
 
-**Security Warning:** Running public servers without GSLT may violate Steam's Terms of Service. Use only for:
+**주의**: 토큰 없이 공개 서버를 돌리는 것은 Steam 약관에 어긋날 수 있습니다. 다음 용도로만 쓰세요.
 
-- Private testing environments
-- LAN servers
-- Development setups
+- 비공개 테스트 환경
+- LAN 서버
+- 개발용
 
-**Why You Should Use a GSLT Token:**
+**GSLT 를 쓰면 좋은 이유**
 
-When your server runs with a GSLT token and the IP address changes, Steam automatically updates the IP address in players' favorites within a few days. This means:
+토큰을 쓰는 서버는 IP 가 바뀌어도 며칠 안에 Steam 이 플레이어의 즐겨찾기를 자동으로 갱신해 줍니다.
 
-- Players don't lose their favorite server when you change hosting providers
-- Server favorites automatically point to the new IP address
-- No manual intervention needed from players
-- Better player retention across IP changes
+1. `192.168.1.100` 에서 토큰을 달고 서버를 돌립니다.
+2. 플레이어가 즐겨찾기에 추가합니다.
+3. 같은 토큰으로 `10.0.0.50` 으로 옮깁니다.
+4. 2~5일 안에 플레이어의 즐겨찾기가 새 IP 로 갱신됩니다.
 
-**Example:**
+**토큰 없이 돌리는 법**
 
-1. Server runs with token on `192.168.1.100`
-2. Players add server to favorites
-3. You migrate to new IP `10.0.0.50` with the same token
-4. Within 2-5 days, players' favorites automatically update to `10.0.0.50`
+*서버 하나만* (권장)
 
-**How to Enable Tokenless Mode:**
+1. 관리자 화면에서 서버로 들어갑니다.
+2. **Startup** 탭에서 `ALLOW_TOKENLESS` 를 찾습니다.
+3. `0` 에서 `1` 로 바꿉니다.
+4. 서버를 재시작합니다.
 
-**Method 1: Per-Server (Recommended)**
+*모든 서버* (egg 기본값)
 
-1. In Pterodactyl, go to your server through the Admin Section
-2. Navigate to **Startup** tab
-3. Find `ALLOW_TOKENLESS` variable
-4. Change value from `0` to `1`
-5. Restart the server
+1. **Admin → Nests → CS2.KR CS2 Egg** → **Variables** 로 갑니다.
+2. `ALLOW_TOKENLESS` 의 `Default Value` 를 `1` 로 바꿉니다.
+3. 저장합니다.
 
-**Method 2: All Servers (Egg Default)**
-
-1. In Pterodactyl, go to **Admin → Nests → KitsuneLab CS2 Egg**
-2. Click **Variables** tab
-3. Find `ALLOW_TOKENLESS` variable
-4. Change `Default Value` from `0` to `1`
-5. Save changes
-6. All new servers will default to tokenless mode
-
-**Note:** This bypasses the `RequireLoginForDedicatedServers` requirement. For production servers, always use a valid GSLT token from [Steam Game Server Account Management](https://steamcommunity.com/dev/managegameservers).
+이 설정은 `gameinfo.gi` 의 `RequireLoginForDedicatedServers` 를 우회합니다. 운영 서버라면
+[Steam 게임 서버 계정 관리](https://steamcommunity.com/dev/managegameservers)에서 정상 토큰을 발급받아 쓰세요.
 
 ---
 
-## Accessing Configuration Files
+## 설정 파일에 접근하기
 
-### Via FTP/SFTP
+### FTP/SFTP
 
-1. Connect to your server via FTP
-2. Navigate to `/egg/configs/`
-3. Edit JSON files with any text editor
-4. Save and restart server
+1. FTP 로 서버에 접속합니다.
+2. `/egg/configs/` 로 갑니다.
+3. 아무 편집기로 JSON 을 고칩니다.
+4. 저장하고 서버를 재시작합니다.
 
-### Via Pterodactyl File Manager
+### Pterodactyl 파일 관리자
 
-1. Go to your server in Pterodactyl
-2. Click **Files**
-3. Navigate to `egg/configs/`
-4. Click file to edit
-5. Save and restart server
+1. 패널에서 서버로 들어갑니다.
+2. **Files** 를 누릅니다.
+3. `egg/configs/` 로 갑니다.
+4. 파일을 눌러 고칩니다.
+5. 저장하고 서버를 재시작합니다.
 
-### Via Console
+### 콘솔
 
 ```bash
-# View config
+# 내용 보기
 cat egg/configs/console-filter.json
 
-# Edit with nano
+# nano 로 고치기
 nano egg/configs/console-filter.json
 ```
 
-## First-Time Setup
+## 첫 기동 때
 
-On first startup:
+1. `/home/container/egg/configs/` 디렉터리가 만들어집니다.
+2. 기본값이 담긴 JSON 파일들이 생깁니다.
+3. 각 파일에는 설명이 담긴 `_description` 배열이 들어 있습니다.
+4. 기능은 대부분 꺼진 상태입니다.
+5. 파일을 고쳐 원하는 기능을 켭니다.
 
-1. `/home/container/egg/configs/` directory is created
-2. All JSON files are created with defaults
-3. Each file includes `_description` array with documentation
-4. All features are disabled by default
-5. Edit files to configure and enable features
+## 설정 순서
 
-## Configuration Workflow
+### 1단계: 기능 켜기
 
-### Step 1: Enable Feature
+Pterodactyl egg 변수를 `1` 로 둡니다.
 
-In Pterodactyl egg variables, set to `1`:
+- `ENABLE_FILTER` — 콘솔 필터
+- `CLEANUP_ENABLED` — 자동 정리
+- `PLUGIN_UPDATE_ENABLED` — 서드파티 플러그인 자동업데이트 (기본 켜짐)
 
-- `ENABLE_FILTER` - Console filter
-- `CLEANUP_ENABLED` - Junk cleaner
+CS2 업데이트 시 자동 재시작은 [VPK 동기화와 중앙 업데이트](../features/vpk-sync.md) 를 보세요.
 
-**Note:** For automatic CS2 updates and server restarts, see the [VPK Sync & Centralized Updates](../features/vpk-sync.md) guide.
+### 2단계: 세부 설정
 
-### Step 2: Configure Details
+`/egg/configs/` 의 해당 JSON 파일을 고칩니다.
 
-Edit corresponding JSON file in `/egg/configs/` via FTP:
+### 3단계: 서버 재시작
 
-- Add API tokens
-- Set intervals and timings
-- Configure patterns or commands
-- Customize colors and usernames
+다음 기동 때 반영됩니다.
 
-### Step 3: Restart Server
+## 예시
 
-Changes apply on next server start.
+### 콘솔 필터 켜기
 
-## Examples
-
-### Enable Console Filter
-
-1. Set `ENABLE_FILTER=1` in egg
-2. Edit `egg/configs/console-filter.json`:
+1. egg 변수 `ENABLE_FILTER=1`
+2. `egg/configs/console-filter.json` 을 고칩니다.
 
 ```json
 {
@@ -300,11 +288,11 @@ Changes apply on next server start.
 }
 ```
 
-3. Restart server
+3. 서버를 재시작합니다.
 
-### Enable Daily Log Files
+### 날짜별 로그 파일 남기기
 
-1. Edit `egg/configs/logging.json`:
+1. `egg/configs/logging.json` 을 고칩니다.
 
 ```json
 {
@@ -318,88 +306,68 @@ Changes apply on next server start.
 }
 ```
 
-2. Restart server
-3. Logs appear in `/egg/logs/YYYY-MM-DD.log`
+2. 서버를 재시작합니다.
+3. `/egg/logs/YYYY-MM-DD.log` 에 쌓입니다.
 
-## Troubleshooting
+## 잘 안 될 때
 
-### Config Not Loading
+### 설정이 안 읽힐 때
 
-**Check:**
+- 파일이 `/home/container/egg/configs/` 에 있나요?
+- JSON 문법이 올바른가요? (`jq -e . 파일` 로 확인)
+- 해당 기능을 egg 변수로 켰나요?
+- 고친 뒤 서버를 재시작했나요?
 
-- File exists in `/home/container/egg/configs/`
-- Valid JSON syntax (use jsonlint.com)
-- Feature enabled via Pterodactyl egg variable
-- Server restarted after changes
+### 기능이 동작하지 않을 때
 
-### Feature Not Working
+- egg 변수가 `1` 인가요?
+- 필요한 값(토큰 등)을 채웠나요?
+- 콘솔 로그에 에러가 없나요? `KL-XXX-NN` 코드가 보이면 [에러 코드](../advanced/error-codes.md) 를 보세요.
 
-**Check:**
+### 기본값으로 되돌리기
 
-- Enabled in Pterodactyl egg (`=1`)
-- Required fields filled (API tokens, URLs)
-- Console logs for errors
-- Correct JSON syntax
-
-### Reset to Defaults
-
-Delete config file and restart server:
+파일을 지우고 서버를 재시작하면 다시 만들어집니다.
 
 ```bash
 rm /home/container/egg/configs/console-filter.json
-# Restart - default config recreated
+# 재시작하면 기본 설정이 새로 생긴다
 ```
 
-Or delete all configs:
+전부 되돌리려면 이렇게 합니다. `plugins.json` 은 우리가 배포한 목록이라 함께 사라지니 주의하세요.
 
 ```bash
 rm -rf /home/container/egg/configs/
-# Restart - all defaults recreated
 ```
 
-## Backup and Restore
+## 백업과 복원
 
-### Backup
+### 백업
 
-Via FTP:
+FTP 로 `/egg/` 디렉터리를 통째로 내려받습니다. 설정·로그·버전 기록이 모두 들어 있습니다.
 
-1. Download entire `/egg/` directory
-2. Includes all configs, logs, and versions
-
-Via Console:
+콘솔에서는 이렇게 합니다.
 
 ```bash
 cd /home/container
 tar -czf egg-backup.tar.gz egg/
-# Download egg-backup.tar.gz via FTP
 ```
 
-### Restore
-
-Via FTP:
-
-1. Upload backup
-2. Extract to `/home/container/egg/`
-3. Restart server
-
-Via Console:
+### 복원
 
 ```bash
 cd /home/container
 tar -xzf egg-backup.tar.gz
-# Restart server
+# 서버 재시작
 ```
 
-## Related Documentation
+## 함께 보기
 
-- [VPK Sync & Centralized Updates](../features/vpk-sync.md)
-- [Auto-Updaters](../features/auto-updaters.md)
-- [VPK Sync](../features/vpk-sync.md)
-- [Quick Start](../getting-started/quickstart.md)
+- [서드파티 플러그인 자동업데이트](../features/plugin-updater.md)
+- [프레임워크 자동업데이트](../features/auto-updaters.md)
+- [VPK 동기화와 중앙 업데이트](../features/vpk-sync.md)
+- [자동 정리](../features/cleanup.md)
+- [빠른 시작](../getting-started/quickstart.md)
 
-## Support
+## 도움 요청
 
-Need help with configuration?
-
-- [GitHub Issues](https://github.com/K4ryuu/CS2-Egg/issues)
-- [GitHub Discussions](https://github.com/K4ryuu/CS2-Egg/discussions)
+- [이슈 열기](https://github.com/CS2KR/cs2-egg/issues/new)
