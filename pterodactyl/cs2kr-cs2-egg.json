@@ -29,8 +29,8 @@
   },
   "variables": [
     {
-      "name": "Prefix Text",
-      "description": "콘솔 접두어. 기본값: CS2.KR",
+      "name": "콘솔 접두어",
+      "description": "콘솔 로그 앞에 붙는 이름. 기본값 CS2.KR.",
       "env_variable": "PREFIX_TEXT",
       "default_value": "CS2.KR",
       "user_viewable": false,
@@ -39,8 +39,8 @@
       "field_type": "text"
     },
     {
-      "name": "Allow Tokenless Servers",
-      "description": "Internal setting to allow servers to run without GSLT token.",
+      "name": "토큰 없는 서버 허용",
+      "description": "내부 설정. GSLT 없이도 서버가 뜨도록 허용한다.",
       "env_variable": "ALLOW_TOKENLESS",
       "default_value": "0",
       "user_viewable": false,
@@ -49,8 +49,8 @@
       "field_type": "text"
     },
     {
-      "name": "Source AppID",
-      "description": "NOT VISIBLE TO USERS. DO NOT EDIT.",
+      "name": "Steam AppID",
+      "description": "사용자에게 보이지 않는다. 수정하지 말 것. CS2는 730.",
       "env_variable": "SRCDS_APPID",
       "default_value": "730",
       "user_viewable": false,
@@ -59,8 +59,8 @@
       "field_type": "text"
     },
     {
-      "name": "Max Players",
-      "description": "The maximum number of players the server can host.",
+      "name": "최대 인원",
+      "description": "서버가 수용할 최대 플레이어 수.",
       "env_variable": "SRCDS_MAXPLAYERS",
       "default_value": "32",
       "user_viewable": false,
@@ -69,8 +69,8 @@
       "field_type": "text"
     },
     {
-      "name": "Disable Updates",
-      "description": "Set to 1 to stop updates.",
+      "name": "게임 파일 업데이트 중지",
+      "description": "1이면 기동 시 SteamCMD 로 게임 파일을 갱신하지 않는다. VPK 를 외부에서 동기화하는 서버용. 플러그인 자동업데이트에는 영향이 없다.",
       "env_variable": "SRCDS_STOP_UPDATE",
       "default_value": "0",
       "user_viewable": false,
@@ -79,8 +79,8 @@
       "field_type": "text"
     },
     {
-      "name": "Validate Install",
-      "description": "Toggles SteamCMD validation of game server files. Set to 0 to disable.",
+      "name": "설치 파일 검증",
+      "description": "1이면 SteamCMD 가 게임 파일을 검증한다. 커스텀 설정이 덮어써질 수 있으니 평소에는 0으로 둔다.",
       "env_variable": "SRCDS_VALIDATE",
       "default_value": "0",
       "user_viewable": false,
@@ -89,8 +89,8 @@
       "field_type": "text"
     },
     {
-      "name": "Game Server Login Token (GSLT)",
-      "description": "The Steam Game Server Login Token (GSLT) used to publicly list your server. Optional, but recommended for increased visibility and access to additional features. Learn more: https://steamcommunity.com/dev/managegameservers",
+      "name": "게임 서버 로그인 토큰 (GSLT)",
+      "description": "서버를 공개 목록에 올리기 위한 Steam 토큰. https://steamcommunity.com/dev/managegameservers 에서 App ID 730 으로 발급한다.",
       "env_variable": "STEAM_ACC",
       "default_value": "",
       "user_viewable": true,
@@ -99,8 +99,8 @@
       "field_type": "text"
     },
     {
-      "name": "Map",
-      "description": "The default map for the server.",
+      "name": "시작 맵",
+      "description": "서버가 처음 띄울 맵.",
       "env_variable": "SRCDS_MAP",
       "default_value": "de_dust2",
       "user_viewable": true,
@@ -109,8 +109,8 @@
       "field_type": "text"
     },
     {
-      "name": "Game Type",
-      "description": "",
+      "name": "게임 타입",
+      "description": "CS2 의 game_type cvar. game_mode 와 짝으로 모드를 결정한다. 클래식=0.",
       "env_variable": "GAME_TYPE",
       "default_value": "0",
       "user_viewable": true,
@@ -119,8 +119,8 @@
       "field_type": "text"
     },
     {
-      "name": "Game Mode",
-      "description": "",
+      "name": "게임 모드",
+      "description": "CS2 의 game_mode cvar. game_type 과 짝으로 모드를 결정한다. 캐주얼=0, 경쟁=1.",
       "env_variable": "GAME_MODE",
       "default_value": "0",
       "user_viewable": true,
@@ -129,8 +129,8 @@
       "field_type": "text"
     },
     {
-      "name": "MetaMod:Source",
-      "description": "Base plugin framework required by CounterStrikeSharp. Compatible with all frameworks. Auto-enabled if CSS is selected. Automatically updates on server restart while enabled.",
+      "name": "MetaMod:Source 자동설치",
+      "description": "1이면 기동 시 MetaMod:Source 를 최신으로 갱신한다. CounterStrikeSharp 의 전제 조건이라 CSS 를 켜면 자동으로 함께 켜진다.",
       "env_variable": "INSTALL_METAMOD",
       "default_value": "0",
       "user_viewable": true,
@@ -139,8 +139,8 @@
       "field_type": "text"
     },
     {
-      "name": "CounterStrikeSharp",
-      "description": "C# scripting platform for CS2 plugins. Requires MetaMod:Source (auto-enabled). Compatible with SwiftlyS2. Incompatible with ModSharp. Automatically updates on server restart while enabled.",
+      "name": "CounterStrikeSharp 자동설치",
+      "description": "1이면 기동 시 CounterStrikeSharp 를 최신으로 갱신한다. MetaMod:Source 가 필요하다.",
       "env_variable": "INSTALL_CSS",
       "default_value": "0",
       "user_viewable": true,
@@ -149,8 +149,8 @@
       "field_type": "text"
     },
     {
-      "name": "SwiftlyS2",
-      "description": "Standalone C# framework for Source Engine 2 servers (no MetaMod required). Compatible with CSS. Incompatible with ModSharp. Automatically updates on server restart while enabled.",
+      "name": "SwiftlyS2 자동설치",
+      "description": "1이면 기동 시 SwiftlyS2 를 최신으로 갱신한다. MetaMod 없이 단독으로 도는 C# 프레임워크. CounterStrikeSharp 와 함께 쓰면 충돌할 수 있다.",
       "env_variable": "INSTALL_SWIFTLY",
       "default_value": "0",
       "user_viewable": true,
@@ -159,8 +159,8 @@
       "field_type": "text"
     },
     {
-      "name": "ModSharp",
-      "description": "Standalone C# scripting platform with .NET 9 runtime. Compatible with MetaMod only. Incompatible with CSS and SwiftlyS2 (auto-disabled if enabled). Automatically updates on server restart while enabled.",
+      "name": "ModSharp 자동설치",
+      "description": "1이면 기동 시 ModSharp 를 최신으로 갱신한다. 단독으로 도는 C# 플랫폼. CounterStrikeSharp·SwiftlyS2 와 함께 쓰면 충돌할 수 있다.",
       "env_variable": "INSTALL_MODSHARP",
       "default_value": "0",
       "user_viewable": true,
@@ -169,8 +169,8 @@
       "field_type": "text"
     },
     {
-      "name": "Allow Prerelease Updates",
-      "description": "Allow downloading prerelease/beta versions of frameworks (CSS, SwiftlyS2, ModSharp) from GitHub. Warning: Prereleases may be unstable.",
+      "name": "프리릴리스 허용",
+      "description": "1이면 MetaMod·CounterStrikeSharp 등 프레임워크의 프리릴리스/베타를 내려받는다. 불안정할 수 있다.",
       "env_variable": "PRERELEASE",
       "default_value": "0",
       "user_viewable": true,
@@ -179,8 +179,8 @@
       "field_type": "text"
     },
     {
-      "name": "Console Filter",
-      "description": "Filter unwanted console messages. Configure filter patterns in /egg/configs/console-filter.json",
+      "name": "콘솔 필터",
+      "description": "1이면 원하지 않는 콘솔 메시지를 걸러낸다. 패턴은 볼륨의 egg/configs/console-filter.json 에서 고친다.",
       "env_variable": "ENABLE_FILTER",
       "default_value": "0",
       "user_viewable": true,
@@ -189,8 +189,8 @@
       "field_type": "text"
     },
     {
-      "name": "Custom Parameters",
-      "description": "Custom startup parameters to add to the command line.",
+      "name": "추가 실행 인자",
+      "description": "cs2 실행 명령 뒤에 덧붙일 인자.",
       "env_variable": "CUSTOM_PARAMS",
       "default_value": "",
       "user_viewable": true,
@@ -199,8 +199,8 @@
       "field_type": "text"
     },
     {
-      "name": "Auto Cleanup",
-      "description": "Automatically cleans up old logs, demos, and backup files. Configure cleanup intervals in /egg/configs/cleanup.json",
+      "name": "자동 정리",
+      "description": "1이면 오래된 로그·데모·백업 라운드 파일을 기동 시 지운다. 규칙은 볼륨의 egg/configs/cleanup.json 에서 고친다.",
       "env_variable": "CLEANUP_ENABLED",
       "default_value": "0",
       "user_viewable": true,
@@ -209,8 +209,8 @@
       "field_type": "text"
     },
     {
-      "name": "GDB Remote Debug Port",
-      "description": "GDB remote debugging port for IDA. Specify port number (e.g., 27130) and allocate it in network settings. Connect: IDA → Debugger → Remote GDB debugger. Performance impact: ~5-10%. Leave empty to disable. Development only!",
+      "name": "GDB 원격 디버그 포트",
+      "description": "포트를 지정하면 cs2 가 gdbserver 아래에서 뜨고 디버거 접속을 기다린다. 평소에는 비워 둔다.",
       "env_variable": "GDB_DEBUG_PORT",
       "default_value": "",
       "user_viewable": false,
@@ -219,8 +219,8 @@
       "field_type": "text"
     },
     {
-      "name": "GitHub API Token",
-      "description": "서드파티 플러그인 자동업데이트가 GitHub 릴리스를 조회할 때 쓴다. 비우면 IP당 시간당 60회로 제한되는데, 노드들이 공인 IP를 공유하므로 기동 시 갱신이 실패한다. 권한 없는 fine-grained PAT(public 읽기 전용)면 충분하다.",
+      "name": "GitHub API 토큰",
+      "description": "서드파티 플러그인 자동업데이트(/scripts/plugin-update.sh)가 GitHub 릴리스를 조회할 때 쓴다. 비우면 IP당 시간당 60회로 제한되는데 노드들이 공인 IP를 공유하므로 기동 시 갱신이 실패한다. 권한을 하나도 주지 않은 fine-grained PAT 면 충분하다.",
       "env_variable": "GITHUB_TOKEN",
       "default_value": "",
       "user_viewable": false,
@@ -229,8 +229,8 @@
       "field_type": "text"
     },
     {
-      "name": "Third-party Plugin Auto-update",
-      "description": "0 이면 서드파티 플러그인 자동업데이트를 건너뛴다. 대상 목록은 볼륨의 egg/configs/plugins.json.",
+      "name": "서드파티 플러그인 자동업데이트",
+      "description": "1이면 기동 시 볼륨의 egg/configs/plugins.json 에 적힌 서드파티 플러그인을 GitHub 최신 릴리스로 갱신한다. 이미 설치된 것만 갱신하며 기존 설정 파일은 덮어쓰지 않는다. 실패해도 서버는 그대로 뜬다.",
       "env_variable": "PLUGIN_UPDATE_ENABLED",
       "default_value": "1",
       "user_viewable": true,
