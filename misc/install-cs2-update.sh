@@ -15,6 +15,7 @@ set -euo pipefail
 INSTALL_DEST="/usr/local/bin/update-cs2-centralized.sh"
 SERVICE_DEST="/etc/systemd/system/cs2-vpk-daemon.service"
 CRON_FILE="/etc/cron.d/cs2-update"
+LOGROTATE_FILE="/etc/logrotate.d/cs2-update"
 LOG_FILE="/var/log/cs2-update.log"
 GITHUB_SCRIPT="https://raw.githubusercontent.com/CS2KR/cs2-egg/main/misc/update-cs2-centralized.sh"
 
@@ -81,6 +82,7 @@ printf "    ${CYAN}%s${RESET} %-30s ${CYAN}→${RESET}  ${BOLD}%s${RESET}\n" "1.
 printf "    ${CYAN}%s${RESET} %-30s ${CYAN}→${RESET}  ${GRAY}%s${RESET}\n"  "2." "Walk you through configuration" "(wizard)"
 printf "    ${CYAN}%s${RESET} %-30s ${CYAN}→${RESET}  ${BOLD}%s${RESET}\n" "3." "Install the VPK push daemon" "$SERVICE_DEST"
 printf "    ${CYAN}%s${RESET} %-30s ${CYAN}→${RESET}  ${BOLD}%s${RESET}\n" "4." "Register a root cron job"   "$CRON_FILE"
+printf "    ${CYAN}%s${RESET} %-30s ${CYAN}→${RESET}  ${BOLD}%s${RESET}\n" "5." "Install log rotation"       "$LOGROTATE_FILE"
 echo ""
 if ! ask_yes_no "  Proceed? [y/N] "; then
     echo "  Aborted."
@@ -289,6 +291,28 @@ chmod 644 "$CRON_FILE"
 log_ok "Cron job registered ($CRON_SCHEDULE)"
 
 touch "$LOG_FILE" && chmod 644 "$LOG_FILE"
+
+# 5. Log rotation (cron appends to LOG_FILE every minute; without this it grows unbounded)
+if command -v logrotate >/dev/null 2>&1; then
+    log_info "Installing log rotation..."
+    # su root root: /var/log is group-writable on Debian, logrotate refuses without it
+    cat > "$LOGROTATE_FILE" << EOF
+$LOG_FILE {
+    su root root
+    daily
+    rotate 7
+    maxsize 20M
+    missingok
+    notifempty
+    compress
+    create 0644 root root
+}
+EOF
+    chmod 644 "$LOGROTATE_FILE"
+    log_ok "Log rotation registered ($LOGROTATE_FILE)"
+else
+    log_warn "logrotate not found - $LOG_FILE will grow unbounded"
+fi
 
 # ── Done ──────────────────────────────────────────────────────────────────────
 
