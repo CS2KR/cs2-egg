@@ -946,7 +946,9 @@ push_vpk_to_containers() {
     done
 
     local containers
-    containers=$(docker ps --format "{{.Names}}\t{{.Image}}" | grep -E "$grep_pattern" | cut -f1)
+    # grep exits 1 when nothing matches; set -e would kill the script before the
+    # empty-check below ever runs (restart_docker_containers is shielded by `local`).
+    containers=$(docker ps --format "{{.Names}}\t{{.Image}}" | grep -E "$grep_pattern" | cut -f1) || true
 
     if [ -z "$containers" ]; then
         log_info "No running containers found for VPK push"
