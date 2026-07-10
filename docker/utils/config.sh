@@ -2,8 +2,9 @@
 
 source /utils/logging.sh
 
-# Current config version - bump this when changing fields
-CONFIG_VERSION="1.1.0"
+# 설정 파일 버전. 필드나 설명을 바꾸면 올린다.
+# 올리면 기존 파일을 다시 만들고 apply_smart_merge 가 사용자가 바꾼 '값' 만 되살린다.
+CONFIG_VERSION="1.2.0"
 
 # Use organized egg directory structure
 CONFIG_DIR="${EGG_CONFIGS_DIR:-/home/container/egg/configs}"
@@ -118,27 +119,23 @@ create_console_filter_config() {
 {
   "version": "$CONFIG_VERSION",
   "_description": [
-    "Console Filter Configuration",
+    "콘솔 필터 설정",
     "",
-    "Filter unwanted console messages from CS2 server output.",
+    "CS2 서버가 콘솔에 쏟아내는 메시지 중 보고 싶지 않은 것을 걸러냅니다.",
     "",
-    "Settings:",
-    "  - preview_mode: Show blocked messages in debug log (true/false)",
-    "  - patterns: Array of filter patterns",
+    "항목",
+    "  - preview_mode: 걸러낸 메시지를 디버그 로그에 남길지 여부입니다 (true/false).",
+    "  - patterns: 필터 패턴 목록입니다.",
     "",
-    "Pattern Matching:",
-    "  - Prefix with @ for exact match: \"@Server is hibernating\"",
-    "  - Without @ for contains match: \"edicts used\"",
+    "패턴 규칙",
+    "  - 앞에 @ 를 붙이면 줄 전체가 똑같을 때만 막습니다. 예) \"@Server is hibernating\"",
+    "  - @ 없이 쓰면 그 문구가 들어간 줄을 모두 막습니다. 예) \"edicts used\"",
     "",
-    "Examples:",
-    "  \"@exact text\" - Only blocks lines that match exactly",
-    "  \"contains this\" - Blocks any line containing this text",
+    "STEAM_ACC 토큰은 설정되어 있으면 자동으로 가려집니다.",
     "",
-    "Note: STEAM_ACC token is automatically masked if set.",
+    "이 기능은 Pterodactyl egg 변수 ENABLE_FILTER=1 로 켭니다.",
     "",
-    "Enable this feature by setting ENABLE_FILTER=1 in the Pterodactyl egg.",
-    "",
-    "Config location: /home/container/egg/configs/console-filter.json"
+    "설정 파일 위치는 /home/container/egg/configs/console-filter.json 입니다."
   ],
   "preview_mode": false,
   "patterns": [
@@ -166,28 +163,28 @@ create_cleanup_config() {
 {
   "version": "$CONFIG_VERSION",
   "_description": [
-    "Cleanup Configuration — rule-based",
+    "자동 정리 설정 — 규칙 기반",
     "",
-    "Every entry in 'rules' is an independent cleanup target. You can edit,",
-    "disable, add, or remove rules without touching any code.",
+    "'rules' 의 각 항목은 독립적인 정리 대상입니다. 코드를 건드리지 않고",
+    "규칙을 고치거나 끄거나 더하거나 지울 수 있습니다.",
     "",
-    "Rule fields:",
-    "  - name: Stat category shown in log output (e.g. 'demos', 'backup_rounds')",
-    "  - description: Free-text comment (ignored by the engine)",
-    "  - directories: Array of paths to search (relative to /home/container or absolute)",
-    "  - patterns: Array of filename globs (e.g. '*.dem', 'core.[0-9]*')",
-    "  - hours: File must be older than this many hours (0 = delete on every run)",
-    "  - recursive: true = walk subdirectories, false = only the directory root",
-    "  - enabled: false disables the rule without deleting it",
+    "규칙 항목",
+    "  - name: 로그에 표시되는 분류 이름입니다. 예) 'demos', 'backup_rounds'",
+    "  - description: 사람이 읽는 설명입니다. 동작에는 영향을 주지 않습니다.",
+    "  - directories: 찾아볼 경로 목록입니다. /home/container 기준 상대경로 또는 절대경로입니다.",
+    "  - patterns: 파일 이름 패턴 목록입니다. 예) '*.dem', 'core.[0-9]*'",
+    "  - hours: 이 시간보다 오래된 파일만 지웁니다. 0 이면 실행할 때마다 지웁니다.",
+    "  - recursive: true 면 하위 디렉터리까지, false 면 해당 디렉터리만 봅니다.",
+    "  - enabled: false 로 두면 규칙을 지우지 않고 끌 수 있습니다.",
     "",
-    "Enable cleanup by setting CLEANUP_ENABLED=1 in the Pterodactyl egg.",
+    "이 기능은 Pterodactyl egg 변수 CLEANUP_ENABLED=1 로 켭니다.",
     "",
-    "Config location: /home/container/egg/configs/cleanup.json"
+    "설정 파일 위치는 /home/container/egg/configs/cleanup.json 입니다."
   ],
   "rules": [
     {
       "name": "backup_rounds",
-      "description": "CS2 match backup round snapshots",
+      "description": "CS2 경기 라운드 백업 스냅샷입니다.",
       "directories": ["./game/csgo"],
       "patterns": ["backup_round*.txt"],
       "hours": 24,
@@ -196,7 +193,7 @@ create_cleanup_config() {
     },
     {
       "name": "demos",
-      "description": "SourceTV demo recordings",
+      "description": "SourceTV 데모 녹화 파일입니다.",
       "directories": ["./game/csgo"],
       "patterns": ["*.dem"],
       "hours": 168,
@@ -205,7 +202,7 @@ create_cleanup_config() {
     },
     {
       "name": "css_logs",
-      "description": "CounterStrikeSharp log files",
+      "description": "CounterStrikeSharp 로그 파일입니다.",
       "directories": ["./game/csgo/addons/counterstrikesharp/logs"],
       "patterns": ["*.txt"],
       "hours": 72,
@@ -214,7 +211,7 @@ create_cleanup_config() {
     },
     {
       "name": "swiftly_logs",
-      "description": "SwiftlyS2 log files",
+      "description": "SwiftlyS2 로그 파일입니다.",
       "directories": ["./game/csgo/addons/swiftlys2/logs"],
       "patterns": ["*.log"],
       "hours": 72,
@@ -223,7 +220,7 @@ create_cleanup_config() {
     },
     {
       "name": "accelerator_dumps",
-      "description": "AcceleratorCS2 crash dumps and reports",
+      "description": "AcceleratorCS2 크래시 덤프와 리포트입니다.",
       "directories": ["./game/csgo/addons/AcceleratorCS2/dumps"],
       "patterns": ["*.dmp", "*.dmp.txt"],
       "hours": 168,
@@ -232,7 +229,7 @@ create_cleanup_config() {
     },
     {
       "name": "core_dumps",
-      "description": "Linux core dumps (delete on every run)",
+      "description": "리눅스 코어 덤프입니다. 실행할 때마다 지웁니다.",
       "directories": ["./game/bin/linuxsteamrt64", "/home/container"],
       "patterns": ["core", "core.[0-9]*"],
       "hours": 0,
@@ -262,26 +259,26 @@ create_logging_config() {
 {
   "version": "$CONFIG_VERSION",
   "_description": [
-    "Logging Configuration",
+    "로그 설정",
     "",
-    "Control console output level and file logging.",
+    "콘솔에 찍히는 로그 수준과 파일 로그를 조절합니다.",
     "",
-    "Console Settings:",
-    "  - logging.console_level: Minimum log level for console output",
-    "    Available levels: DEBUG, INFO, WARNING, ERROR",
+    "콘솔",
+    "  - logging.console_level: 콘솔에 찍을 최소 로그 수준입니다.",
+    "    쓸 수 있는 값은 DEBUG, INFO, WARNING, ERROR 입니다.",
     "",
-    "File Logging:",
-    "  - logging.file_enabled: Enable daily rotating log files (true/false)",
-    "  - logging.max_size_mb: Maximum total log directory size in MB",
-    "  - logging.max_files: Maximum number of log files to keep",
-    "  - logging.max_days: Maximum age of log files in days",
+    "파일 로그",
+    "  - logging.file_enabled: 날짜별 로그 파일을 남길지 여부입니다 (true/false).",
+    "  - logging.max_size_mb: 로그 디렉터리 전체 크기 상한입니다 (MB).",
+    "  - logging.max_files: 보관할 로그 파일 개수 상한입니다.",
+    "  - logging.max_days: 로그 파일을 보관할 최대 일수입니다.",
     "",
-    "Log files stored in: /home/container/egg/logs/YYYY-MM-DD.log",
-    "Rotation triggers when ANY limit is reached (size OR count OR age)",
+    "로그 파일은 /home/container/egg/logs/YYYY-MM-DD.log 에 쌓입니다.",
+    "크기·개수·기간 중 하나라도 상한에 닿으면 오래된 것부터 지웁니다.",
     "",
-    "Note: This config is always loaded and does not require an environment variable.",
+    "이 설정은 항상 읽히며 별도의 egg 변수가 필요하지 않습니다.",
     "",
-    "Config location: /home/container/egg/configs/logging.json"
+    "설정 파일 위치는 /home/container/egg/configs/logging.json 입니다."
   ],
   "logging": {
     "console_level": "INFO",
