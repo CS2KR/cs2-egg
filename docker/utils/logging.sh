@@ -134,23 +134,26 @@ log_message() {
         message="$(mask_secrets "$message")"
     fi
 
-    # Enterprise-style table output:  PREFIX | LEVEL | message
-    # Level tag padded to 5 chars via printf %-5s — aligns columns across levels.
+    # 표 형태 출력:  PREFIX | 레벨 | 메시지
+    #
+    # printf 의 %-5s 는 문자 폭이 아니라 바이트 수로 채운다. 한글은 UTF-8 로 3바이트라
+    # "정보"(6바이트)는 이미 5를 넘어 패딩이 붙지 않고, "디버그"(9바이트)는 더 밀린다.
+    # 그래서 태그를 표시 폭 6칸에 미리 맞춰 두고 %s 로 그대로 찍는다.
     local level_tag level_color
     case "$type" in
-        info)     level_tag="INFO";  level_color="$CYAN" ;;
-        success)  level_tag="OK";    level_color="$GREEN" ;;
-        warning)  level_tag="WARN";  level_color="$YELLOW" ;;
-        error)    level_tag="ERROR"; level_color="$RED" ;;
-        debug)    level_tag="DEBUG"; level_color="$GRAY" ;;
-        running)  level_tag="RUN";   level_color="$YELLOW" ;;
-        *)        level_tag="INFO";  level_color="$WHITE" ;;
+        info)     level_tag="정보  ";  level_color="$CYAN" ;;
+        success)  level_tag="완료  ";  level_color="$GREEN" ;;
+        warning)  level_tag="경고  ";  level_color="$YELLOW" ;;
+        error)    level_tag="오류  ";  level_color="$RED" ;;
+        debug)    level_tag="디버그";  level_color="$GRAY" ;;
+        running)  level_tag="실행  ";  level_color="$YELLOW" ;;
+        *)        level_tag="정보  ";  level_color="$WHITE" ;;
     esac
 
     local sep
     sep=$(printf '%b|%b' "$GRAY" "$NC")
 
-    printf "%b%s%b %s %b%-5s%b %s %b%s%b\n" \
+    printf "%b%s%b %s %b%s%b %s %b%s%b\n" \
         "$RED" "$PREFIX_TEXT" "$NC" \
         "$sep" \
         "$level_color" "$level_tag" "$NC" \
