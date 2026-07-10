@@ -31,7 +31,7 @@ detect_daemon_vpk() {
             sleep 0.1
             ((t++)) || true
             if ! $announced && [ "$t" -ge "$announce_ticks" ]; then
-                log_message "Waiting for daemon to finish push..." "running"
+                log_message "데몬이 푸시를 마칠 때까지 기다립니다..." "running"
                 announced=true
             fi
         done
@@ -39,21 +39,21 @@ detect_daemon_vpk() {
 
     if [ ! -f "$marker" ]; then
         if [ "${SYNC_LOCATION+defined}" = "defined" ]; then
-            log_message "⚠️  DEPRECATION WARNING ⚠️" "warning"
-            log_message "SYNC_LOCATION is deprecated and will be removed after 2026-10-01!" "warning"
-            log_message "  → Import the latest egg - it will clean this up automatically." "warning"
-            log_message "  → Install daemon: curl -fsSL https://raw.githubusercontent.com/K4ryuu/CS2-Egg/main/misc/install-cs2-update.sh -o /tmp/install-cs2-update.sh && sudo bash /tmp/install-cs2-update.sh" "warning"
+            log_message "⚠️  더 이상 쓰이지 않는 설정입니다 ⚠️" "warning"
+            log_message "SYNC_LOCATION 은 2026-10-01 이후 제거됩니다!" "warning"
+            log_message "  → 최신 egg 를 import 하면 자동으로 정리됩니다." "warning"
+            log_message "  → 데몬 설치: curl -fsSL https://raw.githubusercontent.com/CS2KR/cs2-egg/main/misc/install-cs2-update.sh -o /tmp/install-cs2-update.sh && sudo bash /tmp/install-cs2-update.sh" "warning"
         fi
         return 0
     fi
 
     export DAEMON_EVIDENCE_FOUND=1
     if [ "${SYNC_LOCATION+defined}" = "defined" ]; then
-        log_message "Daemon detected - ignoring deprecated SYNC_LOCATION variable" "info"
-        log_message "  → Remove SYNC_LOCATION from startup variables to silence this notice" "info"
+        log_message "데몬을 감지했습니다 — 폐기된 SYNC_LOCATION 변수를 무시합니다" "info"
+        log_message "  → 이 안내를 없애려면 시작 변수에서 SYNC_LOCATION 을 지우세요" "info"
     fi
 
-    log_message "Daemon-managed ($(_vpk_info))" "info"
+    log_message "데몬이 관리합니다 ($(_vpk_info))" "info"
     SRCDS_STOP_UPDATE=1
 }
 
@@ -80,7 +80,7 @@ cleanup_daemon_mode() {
         return 0
     fi
 
-    log_message "Daemon mode active - removing ${#existing[@]} stale artifact(s)" "info"
+    log_message "데몬 모드입니다 — 낡은 파일 ${#existing[@]} 개를 지웁니다" "info"
     rm -rf "${existing[@]}" 2>/dev/null || true
 }
 

@@ -44,12 +44,12 @@ sync_files() {
 
     # Make sure the source directory actually exists
     if [ ! -d "$src_dir" ]; then
-        log_warn_code "KL-DMN-05" "SYNC_LOCATION directory not found: $src_dir - skipping VPK sync" \
-            "If using centralized VPK push, clear the SYNC_LOCATION variable on this server."
+        log_warn_code "KL-DMN-05" "SYNC_LOCATION 디렉터리가 없습니다: $src_dir — VPK 동기화를 건너뜁니다" \
+            "중앙에서 VPK 를 밀어 넣는 방식이라면 이 서버의 SYNC_LOCATION 변수를 비우세요."
         return 0
     fi
 
-    log_message "Syncing VPK files..." "info"
+    log_message "VPK 파일을 동기화합니다..." "info"
 
     # Sync everything EXCEPT .vpk files, configs, and gameinfo.gi
     # We'll symlink VPKs separately to save space
@@ -57,7 +57,7 @@ sync_files() {
     if rsync -aKLz --exclude '*.vpk' --exclude 'cfg/' --exclude 'game/csgo/gameinfo.gi' "$src_dir/" "$dest_dir" 2>/dev/null; then
         : # base files synced silently
     else
-        log_error_code "KL-DMN-06" "Failed to sync base files"
+        log_error_code "KL-DMN-06" "기본 파일 동기화에 실패했습니다"
         return 1
     fi
 
@@ -66,7 +66,7 @@ sync_files() {
     local gameinfo_dest="$dest_dir/game/csgo/gameinfo.gi"
     if [ -f "$gameinfo_src" ] && [ ! -f "$gameinfo_dest" ]; then
         cp "$gameinfo_src" "$gameinfo_dest" 2>/dev/null
-        log_message "Copied initial gameinfo.gi" "debug"
+        log_message "초기 gameinfo.gi 를 복사했습니다" "debug"
     fi
 
     # Now create symlinks for all the VPK files
@@ -94,13 +94,13 @@ sync_files() {
             ((vpk_count++))
             vpk_total_size=$((vpk_total_size + file_size))
         else
-            log_message "Failed to link: $rel_path" "warning"
+            log_message "링크에 실패했습니다: $rel_path" "warning"
         fi
     done < <(find "$src_dir" -type f -name "*.vpk" -print0 2>/dev/null)
 
     local human_total
     human_total=$(format_bytes "$vpk_total_size")
-    log_message "VPK sync complete - linked ${vpk_count} file(s), total VPK size ${human_total} (approx. per-server saving)" "success"
+    log_message "VPK 동기화 완료 — ${vpk_count} 개 링크, 총 ${human_total} (서버당 절약되는 대략의 용량)" "success"
 
     return 0
 }
@@ -138,13 +138,13 @@ sync_cfg_files() {
             if cp "$cfg_file" "$dest_file" 2>/dev/null; then
                 ((synced_count++))
             else
-                log_message "Failed to copy: $filename" "warning"
+                log_message "복사에 실패했습니다: $filename" "warning"
             fi
         fi
     done
 
     if [ $synced_count -gt 0 ]; then
-        log_message "Synced $synced_count default config file(s)" "debug"
+        log_message "기본 설정 파일 $synced_count 개를 동기화했습니다" "debug"
     fi
 
     return 0

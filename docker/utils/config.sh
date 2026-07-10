@@ -28,7 +28,7 @@ check_config_versions() {
 
     # Log once if migration is needed
     if [ "$needs_migration" = true ]; then
-        log_message "Migrating configs from v$old_version to v$CONFIG_VERSION" "info"
+        log_message "설정을 v$old_version 에서 v$CONFIG_VERSION 으로 옮깁니다" "info"
     fi
 }
 
@@ -67,7 +67,7 @@ apply_smart_merge() {
         return 0
     fi
 
-    log_message "Merging previous settings..." "debug"
+    log_message "이전 설정을 병합합니다..." "debug"
     local temp_file="${config_file}.tmp"
 
     jq --argjson old "$old_values" '

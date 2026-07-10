@@ -8,19 +8,19 @@ update_thirdparty_plugins() {
     local manifest="/home/container/egg/configs/plugins.json"
 
     if [ "${PLUGIN_UPDATE_ENABLED:-1}" != "1" ]; then
-        log_message "Third-party plugin updater disabled (PLUGIN_UPDATE_ENABLED=0)" "debug"
+        log_message "서드파티 플러그인 자동업데이트가 꺼져 있습니다 (PLUGIN_UPDATE_ENABLED=0)" "debug"
         return 0
     fi
 
     if [ ! -f "$manifest" ]; then
-        log_message "No third-party plugin manifest at $manifest, skipping" "debug"
+        log_message "플러그인 목록이 없습니다 ($manifest) — 건너뜁니다" "debug"
         return 0
     fi
 
-    log_message "Updating third-party plugins..." "info"
+    log_message "서드파티 플러그인을 갱신합니다..." "info"
 
     if ! timeout "${PLUGIN_UPDATE_TIMEOUT:-300}" bash /scripts/plugin-update.sh; then
-        log_message "Third-party plugin update failed or timed out — starting with existing plugins" "warning"
+        log_message "서드파티 플러그인 갱신이 실패했거나 시간을 초과했습니다 — 기존 플러그인으로 서버를 시작합니다" "warning"
     fi
 
     return 0

@@ -49,7 +49,7 @@ update_addons() {
 
     # Dependency check: CSS requires MetaMod
     if [ "${INSTALL_CSS:-0}" -eq 1 ] && [ "${INSTALL_METAMOD:-0}" -ne 1 ]; then
-        log_message "CounterStrikeSharp requires MetaMod:Source, auto-enabling..." "warning"
+        log_message "CounterStrikeSharp 는 MetaMod:Source 가 필요합니다. 자동으로 켭니다..." "warning"
         INSTALL_METAMOD=1
     fi
 
@@ -61,11 +61,11 @@ update_addons() {
 
     if [ "$modsharp_is_present" = true ]; then
         if [ "${INSTALL_CSS:-0}" -eq 1 ]; then
-            log_message "ModSharp is present alongside CounterStrikeSharp. These addons may be incompatible and may cause conflicts. It is recommended to use only one of them." "warning"
+            log_message "ModSharp 와 CounterStrikeSharp 가 함께 있습니다. 서로 충돌할 수 있으니 하나만 쓰기를 권합니다." "warning"
         fi
 
         if [ "${INSTALL_SWIFTLY:-0}" -eq 1 ]; then
-            log_message "ModSharp is present alongside SwiftlyS2. These addons may be incompatible and may cause conflicts. It is recommended to use only one of them." "warning"
+            log_message "ModSharp 와 SwiftlyS2 가 함께 있습니다. 서로 충돌할 수 있으니 하나만 쓰기를 권합니다." "warning"
         fi
     fi
 
@@ -74,7 +74,7 @@ update_addons() {
         if type update_metamod &>/dev/null; then
             update_metamod
         else
-            log_message "update_metamod function not available" "error"
+            log_message "update_metamod 함수를 찾을 수 없습니다" "error"
         fi
 
         # Configure metamod in gameinfo.gi
@@ -86,7 +86,7 @@ update_addons() {
         if type update_counterstrikesharp &>/dev/null; then
             update_counterstrikesharp
         else
-            log_message "update_counterstrikesharp function not available" "error"
+            log_message "update_counterstrikesharp 함수를 찾을 수 없습니다" "error"
         fi
     fi
 
@@ -95,7 +95,7 @@ update_addons() {
         if type update_swiftly &>/dev/null; then
             update_swiftly
         else
-            log_message "update_swiftly function not available" "error"
+            log_message "update_swiftly 함수를 찾을 수 없습니다" "error"
         fi
 
         # Configure swiftlys2 in gameinfo.gi
@@ -105,7 +105,7 @@ update_addons() {
         local OLD_VDF="/home/container/game/csgo/addons/metamod/swiftlys2.vdf"
         if [ -f "$OLD_VDF" ]; then
             rm -f "$OLD_VDF"
-            log_message "Removed old swiftlys2.vdf from metamod" "debug"
+            log_message "metamod 에서 옛 swiftlys2.vdf 를 지웠습니다" "debug"
         fi
     fi
 
@@ -114,7 +114,7 @@ update_addons() {
         if [ -f "/scripts/updaters/modsharp.sh" ]; then
             bash /scripts/updaters/modsharp.sh
         else
-            log_message "ModSharp updater script not found" "error"
+            log_message "ModSharp 업데이터 스크립트를 찾을 수 없습니다" "error"
         fi
 
         # Configure modsharp in gameinfo.gi

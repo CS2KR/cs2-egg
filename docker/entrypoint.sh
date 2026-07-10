@@ -62,14 +62,14 @@ if [ -n "${SRCDS_APPID}" ] && [ "${SRCDS_STOP_UPDATE:-0}" -eq 0 ]; then
 
     if [ "${SRCDS_VALIDATE}" -eq 1 ]; then
         STEAMCMD+=" validate"
-        log_message "!!! VALIDATION ENABLED: THIS MAY WIPE CUSTOM CONFIGURATIONS!" "warning"
-        log_message "  → Starting in 5 seconds — stop the server NOW to abort." "warning"
+        log_message "!!! 검증이 켜져 있습니다. 커스텀 설정이 지워질 수 있습니다!" "warning"
+        log_message "  → 5초 뒤 시작합니다. 중단하려면 지금 서버를 정지하세요." "warning"
         sleep 5
     fi
 
     STEAMCMD+=" +quit"
 
-    log_message "SteamCMD command: $(echo "$STEAMCMD" | sed -E 's/(\+login [^ ]+ )[^ ]+/\1****/')" "debug"
+    log_message "SteamCMD 명령: $(echo "$STEAMCMD" | sed -E 's/(\+login [^ ]+ )[^ ]+/\1****/')" "debug"
 
     trap - ERR
     eval ${STEAMCMD}
@@ -77,9 +77,9 @@ if [ -n "${SRCDS_APPID}" ] && [ "${SRCDS_STOP_UPDATE:-0}" -eq 0 ]; then
     trap 'handle_error ${LINENO} "$BASH_COMMAND"' ERR
 
     if [ $STEAM_EXIT_CODE -eq 8 ]; then
-        log_error_code "KL-STM-01" "SteamCMD connection error (exit code 8)"
+        log_error_code "KL-STM-01" "SteamCMD 접속 오류입니다 (종료 코드 8)"
     elif [ $STEAM_EXIT_CODE -ne 0 ]; then
-        log_error_code "KL-STM-02" "SteamCMD failed with exit code $STEAM_EXIT_CODE"
+        log_error_code "KL-STM-02" "SteamCMD 가 종료 코드 $STEAM_EXIT_CODE 로 실패했습니다"
     fi
 
     # Update steamclient.so files
@@ -96,14 +96,14 @@ setup_message_filter
 # Build the actual startup command from template
 MODIFIED_STARTUP=$(eval echo $(echo ${STARTUP} | sed -e 's/{{/${/g' -e 's/}}/}/g'))
 
-log_message "Starting server: ${MODIFIED_STARTUP}" "info"
+log_message "서버를 시작합니다: ${MODIFIED_STARTUP}" "info"
 
 # GDB mode: use Valve's built-in GAME_DEBUGGER support (cs2.sh line 106)
 # gdbserver launches cs2 as parent process, so no SYS_PTRACE capability needed
 if [ -n "${GDB_DEBUG_PORT}" ] && [ "${GDB_DEBUG_PORT}" != "0" ]; then
     export GAME_DEBUGGER="gdbserver --no-disable-randomization :${GDB_DEBUG_PORT}"
-    log_message "GDB mode: Server will start under gdbserver on port ${GDB_DEBUG_PORT}" "info"
-    log_message "Server will wait for debugger connection before starting" "warning"
+    log_message "GDB 모드: 서버가 포트 ${GDB_DEBUG_PORT} 의 gdbserver 아래에서 시작합니다" "info"
+    log_message "디버거가 접속할 때까지 서버가 기다립니다" "warning"
 fi
 
 # Actually start the server and handle its output
@@ -116,9 +116,9 @@ eval "$START_CMD" | while IFS= read -r line; do
     # Detect crash via cs2.sh crash message pattern
     if [[ "$line" =~ \./game/cs2\.sh:.*Aborted.*\(core\ dumped\) ]]; then
         handle_server_output "$line"
-        log_warn_code "KL-SRV-01" "Server crash detected" \
-            "Review stack trace above for the failing module" \
-            "Common causes: outdated addons, plugin incompatibility, stale gamedata"
+        log_warn_code "KL-SRV-01" "서버 크래시를 감지했습니다" \
+            "위 스택 트레이스에서 어느 모듈이 죽었는지 확인하세요" \
+            "흔한 원인은 오래된 애드온, 플러그인 충돌, 낡은 gamedata 입니다"
         continue
     fi
 
@@ -127,9 +127,9 @@ eval "$START_CMD" | while IFS= read -r line; do
     if [[ "$line" == *"Cert request for invalid failed"* ]] || \
        [[ "$line" == *"We're not logged into Steam"* ]]; then
         handle_server_output "$line"
-        log_warn_code "KL-SRV-02" "Steam GSLT token invalid or expired" \
-            "Regenerate at https://steamcommunity.com/dev/managegameservers (App ID 730)" \
-            "Update STEAM_ACC in panel startup variables and restart the server"
+        log_warn_code "KL-SRV-02" "Steam GSLT 토큰이 잘못됐거나 만료됐습니다" \
+            "https://steamcommunity.com/dev/managegameservers 에서 App ID 730 으로 재발급하세요" \
+            "패널의 시작 변수 STEAM_ACC 를 바꾼 뒤 서버를 다시 시작하세요"
         continue
     fi
 
@@ -139,4 +139,4 @@ done
 # Clean up any background processes we started
 pkill -P $$ 2>/dev/null || true
 
-log_message "Server stopped" "info"
+log_message "서버가 정지했습니다" "info"

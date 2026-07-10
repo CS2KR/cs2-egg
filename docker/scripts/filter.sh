@@ -41,7 +41,7 @@ setup_message_filter() {
         done <<< "$patterns"
     fi
 
-    log_message "Console filter active: $pattern_count patterns (${#EXACT_PATTERNS[@]} exact, ${#CONTAINS_BLOCK[@]} contains)" "success"
+    log_message "콘솔 필터 동작 중: 패턴 $pattern_count 개 (완전일치 ${#EXACT_PATTERNS[@]}, 포함 ${#CONTAINS_BLOCK[@]})" "success"
 }
 
 handle_server_output() {
@@ -59,14 +59,14 @@ handle_server_output() {
     if [ "${ENABLE_FILTER:-0}" -eq 1 ]; then
         if [[ -n "${EXACT_PATTERNS[$line]}" ]]; then
             if [[ "${FILTER_PREVIEW_MODE:-false}" == "true" ]]; then
-                log_message "Blocked message: $line" "debug"
+                log_message "차단된 메시지: $line" "debug"
             fi
             return
         fi
         for pattern in "${!CONTAINS_BLOCK[@]}"; do
             if [[ $line == *"$pattern"* ]]; then
                 if [[ "${FILTER_PREVIEW_MODE:-false}" == "true" ]]; then
-                    log_message "Blocked message: $line" "debug"
+                    log_message "차단된 메시지: $line" "debug"
                 fi
                 return
             fi

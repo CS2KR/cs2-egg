@@ -19,11 +19,11 @@ install_dotnet_runtime() {
 
     # Check if runtime is up to date
     if [ "$current_dotnet_version" = "$dotnet_version" ] && [ -f "$runtime_dir/dotnet" ]; then
-        log_message ".NET runtime already up to date: $dotnet_version" "debug"
+        log_message ".NET 런타임이 이미 최신입니다: $dotnet_version" "debug"
         return 0
     fi
 
-    log_message "Installing .NET $dotnet_version runtime..." "running"
+    log_message ".NET $dotnet_version 런타임을 설치합니다..." "running"
 
     # Create runtime directory
     mkdir -p "$runtime_dir"
@@ -34,11 +34,11 @@ install_dotnet_runtime() {
 
     if handle_download_and_extract "$dotnet_url" "$download_file" "$runtime_dir" "tar.gz"; then
         update_version_file "DotNet" "$dotnet_version"
-        log_message ".NET $dotnet_version runtime installed successfully" "success"
+        log_message ".NET $dotnet_version 런타임을 설치했습니다" "success"
         rm -f "$download_file"
         return 0
     else
-        log_message "Failed to install .NET runtime" "error"
+        log_message ".NET 런타임 설치에 실패했습니다" "error"
         rm -f "$download_file"
         return 1
     fi
@@ -61,7 +61,7 @@ download_and_extract() {
 update_modsharp() {
     # Step 1: Install/update .NET runtime
     if ! install_dotnet_runtime; then
-        log_message "Failed to install .NET runtime, aborting ModSharp update" "error"
+        log_message ".NET 런타임 설치에 실패해 ModSharp 갱신을 중단합니다" "error"
         return 1
     fi
 
@@ -77,7 +77,7 @@ update_modsharp() {
     fi
 
     if [ -z "$release_info" ] || ! echo "$release_info" | jq -e . >/dev/null 2>&1; then
-        log_message "Failed to get ModSharp release info" "error"
+        log_message "ModSharp 릴리스 정보를 가져오지 못했습니다" "error"
         return 1
     fi
 
@@ -87,51 +87,51 @@ update_modsharp() {
     local extensions_url=$(echo "$release_info" | jq -r '.assets[] | select(.name | contains("linux-extensions.zip")) | .browser_download_url')
 
     if [ -z "$latest_version" ] || [ -z "$core_url" ] || [ -z "$extensions_url" ]; then
-        log_message "Could not parse ModSharp release data" "error"
+        log_message "ModSharp 릴리스 데이터를 해석하지 못했습니다" "error"
         return 1
     fi
 
     # Check if update needed
     local current_version=$(get_current_version "ModSharp")
-    log_message "Current version: ${current_version:-none}" "debug"
-    log_message "Latest version: $latest_version" "debug"
+    log_message "현재 버전: ${current_version:-없음}" "debug"
+    log_message "최신 버전: $latest_version" "debug"
 
     # Check if update is needed
     if [ -n "$current_version" ]; then
         semver_compare "$latest_version" "$current_version"
         case $? in
             0) # Equal
-                log_message "ModSharp is up-to-date ($current_version)" "success"
+                log_message "ModSharp 는 최신입니다 ($current_version)" "success"
                 return 0
                 ;;
             2) # new < current
-                log_message "ModSharp is at a newer version ($current_version) than latest ($latest_version). Skipping downgrade." "info"
+                log_message "ModSharp 가 최신 릴리스($latest_version)보다 새 버전($current_version)입니다. 다운그레이드하지 않습니다." "info"
                 return 0
                 ;;
         esac
     fi
 
-    log_message "Update available: $latest_version (current: ${current_version:-none})" "info"
+    log_message "갱신 가능: $latest_version (현재: ${current_version:-없음})" "info"
 
     # Step 3: Backup user configs if they exist
     if [ -f "$MODSHARP_DIR/configs/core.json" ]; then
         cp "$MODSHARP_DIR/configs/core.json" "$CONFIG_BACKUP"
-        log_message "Backed up core.json" "debug"
+        log_message "core.json 을 백업했습니다" "debug"
     fi
     if [ -f "$MODSHARP_DIR/configs/admins.jsonc" ]; then
         cp "$MODSHARP_DIR/configs/admins.jsonc" "$ADMINS_BACKUP"
-        log_message "Backed up admins.jsonc" "debug"
+        log_message "admins.jsonc 를 백업했습니다" "debug"
     fi
 
     # Step 4: Download and install core (extract to /game/)
     if ! download_and_extract "$core_url" "./game/"; then
-        log_message "Failed to install ModSharp core" "error"
+        log_message "ModSharp 코어 설치에 실패했습니다" "error"
         return 1
     fi
 
     # Step 5: Download and install extensions (extract to /game/sharp/shared/)
     if ! download_and_extract "$extensions_url" "./game/sharp/shared/"; then
-        log_message "Failed to install ModSharp extensions" "warning"
+        log_message "ModSharp 확장 설치에 실패했습니다" "warning"
         # Continue anyway, extensions are not critical
     fi
 
@@ -139,20 +139,20 @@ update_modsharp() {
     if [ -f "$CONFIG_BACKUP" ]; then
         mkdir -p "$MODSHARP_DIR/configs"
         cp "$CONFIG_BACKUP" "$MODSHARP_DIR/configs/core.json"
-        log_message "Restored core.json config" "success"
+        log_message "core.json 설정을 되돌렸습니다" "success"
         rm -f "$CONFIG_BACKUP"
     fi
     if [ -f "$ADMINS_BACKUP" ]; then
         mkdir -p "$MODSHARP_DIR/configs"
         cp "$ADMINS_BACKUP" "$MODSHARP_DIR/configs/admins.jsonc"
-        log_message "Restored admins.jsonc config" "success"
+        log_message "admins.jsonc 설정을 되돌렸습니다" "success"
         rm -f "$ADMINS_BACKUP"
     fi
 
     # Step 8: Update version file
     update_version_file "ModSharp" "$latest_version"
 
-    log_message "ModSharp updated to $latest_version" "success"
+    log_message "ModSharp 를 $latest_version 으로 갱신했습니다" "success"
     return 0
 }
 

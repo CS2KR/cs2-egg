@@ -18,7 +18,7 @@ update_counterstrikesharp() {
 
     # Validate JSON response
     if [ -z "$release_info" ] || ! echo "$release_info" | jq -e . >/dev/null 2>&1; then
-        log_message "Failed to get release info for $REPO" "error"
+        log_message "$REPO 의 릴리스 정보를 가져오지 못했습니다" "error"
         return 1
     fi
 
@@ -27,7 +27,7 @@ update_counterstrikesharp() {
     local current_version=$(get_current_version "CSS")
 
     if [ -z "$new_version" ]; then
-        log_message "Failed to get version for $REPO" "error"
+        log_message "$REPO 의 버전을 읽지 못했습니다" "error"
         return 0
     fi
 
@@ -36,27 +36,27 @@ update_counterstrikesharp() {
         semver_compare "$new_version" "$current_version"
         case $? in
             0) # Equal
-                log_message "CSS is up-to-date ($current_version)" "success"
+                log_message "CounterStrikeSharp 는 최신입니다 ($current_version)" "success"
                 return 0
                 ;;
             2) # new < current
-                log_message "CSS is at a newer version ($current_version) than latest ($new_version). Skipping downgrade." "info"
+                log_message "CounterStrikeSharp 가 최신 릴리스($new_version)보다 새 버전($current_version)입니다. 다운그레이드하지 않습니다." "info"
                 return 0
                 ;;
         esac
     fi
 
     if [ -z "$asset_url" ]; then
-        log_message "No suitable asset found for $REPO" "error"
+        log_message "$REPO 에서 알맞은 에셋을 찾지 못했습니다" "error"
         return 0
     fi
 
-    log_message "Update available for CSS: $new_version (current: ${current_version:-none})" "info"
+    log_message "CounterStrikeSharp 갱신: $new_version (현재: ${current_version:-없음})" "info"
 
     if handle_download_and_extract "$asset_url" "$temp_dir/download.zip" "$temp_dir" "zip"; then
         cp -r "$temp_dir/addons/." "$OUTPUT_DIR" && \
         update_version_file "CSS" "$new_version" && \
-        log_message "CounterStrikeSharp updated to $new_version" "success"
+        log_message "CounterStrikeSharp 를 $new_version 으로 갱신했습니다" "success"
         return 0
     fi
 

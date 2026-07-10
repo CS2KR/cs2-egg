@@ -23,7 +23,7 @@ LOG_FILE_ENABLED="${LOG_FILE_ENABLED:=0}"
 LOG_MAX_SIZE_MB="${LOG_MAX_SIZE_MB:=100}"
 LOG_MAX_FILES="${LOG_MAX_FILES:=30}"
 LOG_MAX_DAYS="${LOG_MAX_DAYS:=7}"
-PREFIX_TEXT="${PREFIX_TEXT:-KitsuneLab}"
+PREFIX_TEXT="${PREFIX_TEXT:-CS2.KR}"
 
 # Set up the directory structure
 init_egg_directories() {
@@ -168,7 +168,7 @@ log_message() {
 # Emit an error/warning with a stable code + docs pointer.
 # Optional trailing args become "→ <hint>" lines between the code line and the docs link.
 # Usage: log_error_code "KL-STM-01" "SteamCMD connection error" "Check: steamstat.us"
-ERROR_DOCS_URL="${ERROR_DOCS_URL:-https://github.com/K4ryuu/CS2-Egg/blob/main/docs/advanced/error-codes.md}"
+ERROR_DOCS_URL="${ERROR_DOCS_URL:-https://github.com/CS2KR/cs2-egg/blob/main/docs/advanced/error-codes.md}"
 
 _log_code_common() {
     local severity="$1"; shift
@@ -180,7 +180,7 @@ _log_code_common() {
     for hint in "$@"; do
         log_message "  → $hint" "$severity"
     done
-    log_message "  → Docs: ${ERROR_DOCS_URL}#${anchor}" "$severity"
+    log_message "  → 문서: ${ERROR_DOCS_URL}#${anchor}" "$severity"
 }
 
 log_error_code() { _log_code_common "error" "$@"; }
@@ -193,15 +193,15 @@ handle_error() {
 
     case $exit_code in
         127)
-            log_message "Command not found: $last_command" "error"
-            log_message "Exit code: 127" "error"
+            log_message "명령을 찾을 수 없습니다: $last_command" "error"
+            log_message "종료 코드: 127" "error"
             ;;
         0)
             return 0
             ;;
         *)
-            log_message "Error on line $line_number: $last_command" "error"
-            log_message "Exit code: $exit_code" "error"
+            log_message "$line_number 번째 줄에서 오류: $last_command" "error"
+            log_message "종료 코드: $exit_code" "error"
             ;;
     esac
 

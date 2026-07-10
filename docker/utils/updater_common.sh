@@ -14,10 +14,10 @@ get_github_release() {
 
     # Select endpoint based on prerelease setting (log to stderr to not pollute output)
     if [ "${PRERELEASE:-0}" = "1" ]; then
-        log_message "Checking releases (prereleases enabled) for $repo" "debug" >&2
+        log_message "$repo 의 릴리스를 확인합니다 (프리릴리스 포함)" "debug" >&2
     else
         url="$url/latest"
-        log_message "Checking latest stable release for $repo" "debug" >&2
+        log_message "$repo 의 최신 정식 릴리스를 확인합니다" "debug" >&2
     fi
 
     curl -s "$url" 2>/dev/null | jq --arg p "$asset_pattern" '
@@ -97,21 +97,21 @@ handle_download_and_extract() {
 
     local _ok=false
     for _url in "${_urls[@]}"; do
-        log_message "Downloading from: $_url" "debug"
+        log_message "내려받는 중: $_url" "debug"
         if curl -fsSL -m 300 -A "Mozilla/5.0" -o "$output_file" "$_url"; then
             _ok=true
             break
         fi
-        log_message "Download failed, trying next mirror..." "warning"
+        log_message "다운로드 실패. 다음 미러를 시도합니다..." "warning"
     done
 
     if ! $_ok; then
-        log_message "All download sources failed" "error"
+        log_message "모든 다운로드 경로가 실패했습니다" "error"
         return 1
     fi
 
     if [ ! -s "$output_file" ]; then
-        log_message "Downloaded file is empty" "error"
+        log_message "받은 파일이 비어 있습니다" "error"
         return 1
     fi
 
@@ -120,13 +120,13 @@ handle_download_and_extract() {
     case $file_type in
         "zip")
             unzip -qq -o "$output_file" -d "$extract_dir" || {
-                log_message "Failed to extract zip file" "error"
+                log_message "zip 압축을 풀지 못했습니다" "error"
                 return 1
             }
             ;;
         "tar.gz")
             tar -xzf "$output_file" -C "$extract_dir" || {
-                log_message "Failed to extract tar.gz file" "error"
+                log_message "tar.gz 압축을 풀지 못했습니다" "error"
                 return 1
             }
             ;;
@@ -142,22 +142,22 @@ check_version() {
     local new="$3"
 
     if [ "$current" = "none" ] || [ -z "$current" ]; then
-        log_message "Update available for $addon: $new (current: none)" "info"
+        log_message "$addon 을(를) 설치합니다: $new (현재: 없음)" "info"
         return 0 # New install
     fi
 
     semver_compare "$new" "$current"
     case $? in
         0) # Equal
-            log_message "$addon is up-to-date ($current)" "debug"
+            log_message "$addon 은(는) 최신입니다 ($current)" "debug"
             return 1
             ;;
         1) # new > current
-            log_message "Update available for $addon: $new (current: $current)" "info"
+            log_message "$addon 갱신 가능: $new (현재: $current)" "info"
             return 0
             ;;
         2) # new < current
-            log_message "$addon is at a newer version ($current) than latest ($new). Skipping downgrade." "info"
+            log_message "$addon 은(는) 최신 릴리스($new)보다 새 버전($current)입니다. 다운그레이드하지 않습니다." "info"
             return 1
             ;;
     esac
@@ -171,21 +171,21 @@ add_to_gameinfo() {
     local GAMEINFO_FILE="/home/container/game/csgo/gameinfo.gi"
 
     if [ ! -f "$GAMEINFO_FILE" ]; then
-        log_message "gameinfo.gi not found at $GAMEINFO_FILE" "error"
+        log_message "$GAMEINFO_FILE 에 gameinfo.gi 가 없습니다" "error"
         return 1
     fi
 
     # Check if path already exists
     if grep -q "Game[[:blank:]]*${addon_path}" "$GAMEINFO_FILE"; then
-        log_message "${addon_path} already in gameinfo.gi" "debug"
+        log_message "${addon_path} 은(는) 이미 gameinfo.gi 에 있습니다" "debug"
         return 0
     fi
 
-    log_message "Adding ${addon_path} to gameinfo.gi..." "info"
+    log_message "gameinfo.gi 에 ${addon_path} 을(를) 추가합니다..." "info"
 
     # Create backup
     cp "$GAMEINFO_FILE" "$GAMEINFO_FILE.bak" 2>/dev/null || {
-        log_message "Failed to backup gameinfo.gi" "error"
+        log_message "gameinfo.gi 백업에 실패했습니다" "error"
         return 1
     }
 
@@ -195,18 +195,18 @@ add_to_gameinfo() {
             Game    ${addon_path}" "$GAMEINFO_FILE.bak" > "$GAMEINFO_FILE"
 
     if [ $? -ne 0 ]; then
-        log_message "sed command failed, restoring backup" "error"
+        log_message "sed 실행이 실패해 백업을 되돌립니다" "error"
         mv "$GAMEINFO_FILE.bak" "$GAMEINFO_FILE"
         return 1
     fi
 
     # Verify it was actually added
     if grep -q "Game[[:space:]]*${addon_path}" "$GAMEINFO_FILE"; then
-        log_message "Added ${addon_path} to gameinfo.gi" "info"
+        log_message "gameinfo.gi 에 ${addon_path} 을(를) 추가했습니다" "info"
         rm -f "$GAMEINFO_FILE.bak"
         return 0
     else
-        log_message "WARNING: ${addon_path} not found after sed insertion, restoring backup" "error"
+        log_message "경고: 삽입 후에도 ${addon_path} 이(가) 없어 백업을 되돌립니다" "error"
         mv "$GAMEINFO_FILE.bak" "$GAMEINFO_FILE"
         return 1
     fi
@@ -239,15 +239,15 @@ ensure_metamod_first() {
 
     # If metamod is already first (no Game lines between LV and metamod), done
     if [ "$has_addons_before" = false ]; then
-        log_message "MetaMod already in correct position" "debug"
+        log_message "MetaMod 가 이미 올바른 위치에 있습니다" "debug"
         return 0
     fi
 
-    log_message "Repositioning MetaMod to first position after LowViolence..." "info"
+    log_message "MetaMod 를 LowViolence 바로 뒤로 옮깁니다..." "info"
 
     # Backup
     cp "$GAMEINFO_FILE" "$GAMEINFO_FILE.bak" 2>/dev/null || {
-        log_message "Failed to backup gameinfo.gi" "error"
+        log_message "gameinfo.gi 백업에 실패했습니다" "error"
         return 1
     }
 
@@ -262,11 +262,11 @@ ensure_metamod_first() {
 
     # Verify
     if grep -q "Game.*csgo/addons/metamod" "$GAMEINFO_FILE"; then
-        log_message "MetaMod repositioned successfully" "success"
+        log_message "MetaMod 위치를 옮겼습니다" "success"
         rm -f "$GAMEINFO_FILE.bak"
         return 0
     else
-        log_message "Failed to reposition MetaMod, restoring backup" "error"
+        log_message "MetaMod 위치 변경에 실패해 백업을 되돌립니다" "error"
         mv "$GAMEINFO_FILE.bak" "$GAMEINFO_FILE"
         return 1
     fi
@@ -279,7 +279,7 @@ patch_tokenless_setting() {
     local GAMEINFO_FILE="/home/container/game/csgo/gameinfo.gi"
 
     if [ ! -f "$GAMEINFO_FILE" ]; then
-        log_message "gameinfo.gi not found, skipping tokenless patch" "debug"
+        log_message "gameinfo.gi 가 없어 tokenless 패치를 건너뜁니다" "debug"
         return 0
     fi
 
@@ -296,13 +296,13 @@ patch_tokenless_setting() {
 
     # If already correct, skip
     if [ "$current_value" = "$desired_value" ]; then
-        log_message "RequireLoginForDedicatedServers already set to $desired_value" "debug"
+        log_message "RequireLoginForDedicatedServers 가 이미 $desired_value 입니다" "debug"
         return 0
     fi
 
     # Backup
     cp "$GAMEINFO_FILE" "$GAMEINFO_FILE.bak" 2>/dev/null || {
-        log_message "Failed to backup gameinfo.gi" "error"
+        log_message "gameinfo.gi 백업에 실패했습니다" "error"
         return 1
     }
 
@@ -315,7 +315,7 @@ patch_tokenless_setting() {
         rm -f "$GAMEINFO_FILE.bak"
         return 0
     else
-        log_message "Failed to patch RequireLoginForDedicatedServers, restoring backup" "error"
+        log_message "RequireLoginForDedicatedServers 패치에 실패해 백업을 되돌립니다" "error"
         mv "$GAMEINFO_FILE.bak" "$GAMEINFO_FILE"
         return 1
     fi
