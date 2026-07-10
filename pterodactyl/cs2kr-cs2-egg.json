@@ -6,7 +6,7 @@
   },
   "exported_at": "2026-03-30T16:51:51+00:00",
   "name": "CS2.KR CS2 Egg",
-  "author": "successyr@gmail.com",
+  "author": "contact@cs2.kr",
   "description": "CS2.KR 게임 서버용 egg 입니다. K4ryuu/CS2-Egg (GPL-3.0) 를 기반으로 서드파티 플러그인 자동업데이터를 더했습니다. 볼륨의 egg/configs/plugins.json 에 적힌 플러그인만 기동할 때 GitHub 최신 릴리스로 갱신합니다.",
   "features": [],
   "docker_images": {

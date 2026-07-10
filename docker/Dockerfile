@@ -1,7 +1,7 @@
 # Dockerfile with SteamRT3
 FROM        registry.gitlab.steamos.cloud/steamrt/sniper/platform:latest-container-runtime-depot
 LABEL       author="CS2.KR" \
-            maintainer="successyr@gmail.com" \
+            maintainer="contact@cs2.kr" \
             org.opencontainers.image.description="CS2.KR CS2 egg image. Fork of K4ryuu/CS2-Egg (GPL-3.0) with a third-party plugin auto-updater." \
             org.opencontainers.image.source="https://github.com/CS2KR/cs2-egg" \
             org.opencontainers.image.licenses="GPL-3.0" \
