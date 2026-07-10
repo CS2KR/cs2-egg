@@ -1,5 +1,5 @@
 #!/bin/bash
-# KitsuneLab CS2 Centralized Update Script
+# CS2.KR CS2 Centralized Update Script
 # Automatically updates CS2 files and pushes them to all server containers
 #
 # Usage: ./update-cs2-centralized.sh [--simulate] [--validate]
@@ -34,10 +34,10 @@ STEAMCMD_DIR="/root/steamcmd"
 # Servers using these images will be automatically restarted after update
 # Supports multiple images separated by spaces or commas
 # Examples:
-#   Single: "sples1/k4ryuu-cs2"
-#   Multiple: "sples1/k4ryuu-cs2 ghcr.io/k4ryuu/cs2-egg"
-#   With commas: "sples1/k4ryuu-cs2,ghcr.io/k4ryuu/cs2-egg"
-SERVER_IMAGE="sples1/k4ryuu-cs2 ghcr.io/k4ryuu/cs2-egg"
+#   Single: "ghcr.io/cs2kr/cs2-egg"
+#   Multiple: "ghcr.io/cs2kr/cs2-egg sples1/k4ryuu-cs2"
+#   With commas: "ghcr.io/cs2kr/cs2-egg,sples1/k4ryuu-cs2"
+SERVER_IMAGE="ghcr.io/cs2kr/cs2-egg"
 
 # Optional: Enable automatic server restart after update (true/false)
 # Set to "false" if you want servers to sync on next manual restart
@@ -85,7 +85,7 @@ ORIGINAL_ARGS=("$@")
 # ============================================================================
 
 # Self-update configuration (internal)
-GITHUB_REPO="K4ryuu/CS2-Egg"
+GITHUB_REPO="CS2KR/cs2-egg"
 GITHUB_BRANCH="main"
 SCRIPT_FILENAME="update-cs2-centralized.sh"
 REMOTE_SCRIPT_URL="https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}/misc/${SCRIPT_FILENAME}"
@@ -1396,7 +1396,7 @@ main() {
         esac
     done
 
-    headline "KitsuneLab CS2 Centralized Update"
+    headline "CS2.KR CS2 Centralized Update"
 
     if [ "$SIMULATE_MODE" = "true" ]; then
         log_warn "Running in SIMULATE mode - SteamCMD update will be skipped"

@@ -1,5 +1,5 @@
 #!/bin/bash
-# KitsuneLab CS2 Centralized Update - Installer
+# CS2.KR CS2 Centralized Update - Installer
 #
 # Sets up:
 #   1. Update script   → /usr/local/bin/update-cs2-centralized.sh
@@ -16,7 +16,7 @@ INSTALL_DEST="/usr/local/bin/update-cs2-centralized.sh"
 SERVICE_DEST="/etc/systemd/system/cs2-vpk-daemon.service"
 CRON_FILE="/etc/cron.d/cs2-update"
 LOG_FILE="/var/log/cs2-update.log"
-GITHUB_SCRIPT="https://raw.githubusercontent.com/K4ryuu/CS2-Egg/main/misc/update-cs2-centralized.sh"
+GITHUB_SCRIPT="https://raw.githubusercontent.com/CS2KR/cs2-egg/main/misc/update-cs2-centralized.sh"
 
 # ── Colors ────────────────────────────────────────────────────────────────────
 
@@ -69,8 +69,8 @@ fi
 
 clear
 echo ""
-echo -e "${BOLD}  KitsuneLab CS2 Centralized Update${RESET}  -  Installer"
-echo -e "  ${GRAY}github.com/K4ryuu/CS2-Egg${RESET}"
+echo -e "${BOLD}  CS2.KR CS2 Centralized Update${RESET}  -  Installer"
+echo -e "  ${GRAY}github.com/CS2KR/cs2-egg${RESET}"
 echo ""
 echo -e "  Keeps all CS2 servers on the same version automatically."
 echo -e "  Downloads game files once, pushes them into every container via symlink"
@@ -213,7 +213,7 @@ fi
 section "Installing"
 
 # 1. Download script
-log_info "Downloading update script from ${BOLD}github.com/K4ryuu/CS2-Egg${RESET} ..."
+log_info "Downloading update script from ${BOLD}github.com/CS2KR/cs2-egg${RESET} ..."
 if command -v curl >/dev/null 2>&1; then
     curl -fsSL "$GITHUB_SCRIPT" -o "$INSTALL_DEST" \
         || die "Download failed - check internet access and try again"
@@ -247,7 +247,7 @@ if command -v systemctl >/dev/null 2>&1; then
     cat > "$SERVICE_DEST" << 'EOF'
 [Unit]
 Description=CS2 VPK Push Daemon
-Documentation=https://github.com/K4ryuu/CS2-Egg
+Documentation=https://github.com/CS2KR/cs2-egg
 After=docker.service
 Requires=docker.service
 
