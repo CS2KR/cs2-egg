@@ -902,6 +902,25 @@ _verify_volume_vpks() {
     return 0
 }
 
+# Verify small rsync-copied metadata files (steam.inf) match CS2_DIR.
+# These are NOT symlinked, so a live content update never touches them - only
+# _sync_to_volume() refreshes them. VPK symlinks stay "valid" across an update
+# (the link target's content just changed underneath them), so
+# _verify_volume_vpks() alone never catches a stale steam.inf. Without this,
+# steam.inf is copied once at container creation and then frozen forever,
+# silently reporting the wrong build to players/matchmaking after every
+# subsequent CS2 update. Returns 1 to force a resync when stale.
+_verify_base_files() {
+    local volume_path="$1"
+    local src_file="$CS2_DIR/game/csgo/steam.inf"
+    local vol_file="$volume_path/game/csgo/steam.inf"
+
+    [ -f "$src_file" ] || return 0
+    [ -f "$vol_file" ] || return 1
+    cmp -s "$src_file" "$vol_file" || return 1
+    return 0
+}
+
 push_vpk_to_containers() {
     [ "$VPK_PUSH_METHOD" = "off" ] && return 0
 
@@ -1075,8 +1094,9 @@ run_event_daemon() {
             fi
 
             if [ "$event" = "start" ]; then
-                # self-heal: verify VPKs are properly placed; re-push if not
-                if _verify_volume_vpks "$volume_path"; then
+                # self-heal: verify VPKs are properly placed and base files (steam.inf)
+                # are current; re-push if not
+                if _verify_volume_vpks "$volume_path" && _verify_base_files "$volume_path"; then
                     # all good — refresh marker as heartbeat
                     mkdir -p "$volume_path/egg" 2>/dev/null
                     touch "$volume_path/egg/.daemon-managed" 2>/dev/null || true
@@ -1084,7 +1104,7 @@ run_event_daemon() {
                     rmdir "$lock_file" 2>/dev/null || true
                     continue
                 fi
-                log_warn "Container has missing/broken VPKs: ${BOLD}$container${RESET} - self-healing push..."
+                log_warn "Container has missing/broken VPKs or stale base files: ${BOLD}$container${RESET} - self-healing push..."
             else
                 log_info "Container started: ${BOLD}$container${RESET} - pushing game files before first start..."
             fi
