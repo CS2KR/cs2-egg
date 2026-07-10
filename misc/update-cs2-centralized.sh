@@ -12,7 +12,7 @@
 #                 a CS2 container starts (new server or restart). Install as a
 #                 systemd service for automatic startup.
 #
-# Version: 1.0.46
+# Version: 1.0.47
 
 set -euo pipefail
 
