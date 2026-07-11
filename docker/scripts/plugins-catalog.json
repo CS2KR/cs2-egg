@@ -1,0 +1,378 @@
+{
+  "version": "1.0.0",
+  "_description": [
+    "서드파티 CounterStrikeSharp 플러그인 자동업데이트 카탈로그 (전 서버 공통 원본).",
+    "",
+    "deploy.sh 가 이 카탈로그를 각 서버 볼륨에 이미 설치된 플러그인만 남기고 걸러서",
+    "<volume>/egg/configs/plugins.json 으로 내려보낸다. 여기 없는 디렉터리는 절대 건드리지 않는다.",
+    "",
+    "필드:",
+    "  name    : 버전 기록 키. CSS 플러그인은 plugins/ 아래 디렉터리 이름과 같다.",
+    "  detect  : 설치 여부를 판정할 경로 (game/csgo 기준).",
+    "            생략하면 addons/counterstrikesharp/plugins/<name> 으로 본다.",
+    "  repo    : GitHub owner/repo. releases/latest 를 조회한다.",
+    "  asset   : 릴리스 에셋 이름에 대한 정규식 (jq test()).",
+    "  enabled : false 면 건너뛴다.",
+    "  map     : 릴리스 아카이브 내부 경로(from) → game/csgo 기준 목적지(to).",
+    "            preserve=true 면 없는 파일만 채우고 기존 파일은 덮어쓰지 않는다 (설정·사용자 데이터).",
+    "",
+    "map 은 실제 아카이브를 열어 확인한 값이다. 릴리스 구조가 바뀌면 업데이터가 'zip에 X가 없음'으로",
+    "중단하고 아무것도 건드리지 않는다. 그때 이 파일을 고칠 것.",
+    "",
+    "Metamod:Source 본체와 CounterStrikeSharp 본체는 egg 가 INSTALL_METAMOD/INSTALL_CSS 로",
+    "이미 매 부팅 갱신하므로 여기 넣지 않는다.",
+    "",
+    "제외된 것과 그 이유는 context-notes.md 참조.",
+    "  AutoRestart      CS2KR-Core 에 통합 완료 (2026-07-10). Practice 만 아직 단독 플러그인",
+    "  Killfeed_Icons   CS2KR-Core 에 자체 구현으로 통합 완료 (2026-07-10). GPL 소스는 복사하지 않았다",
+    "  CS2CrossChat     CS2KR-Core 에 자체 구현으로 통합 완료 (2026-07-10). GOKZ 쪽은 cs2kr_chat.sp 에 남음",
+    "  NadeLauncher     Windows 배포본 (plugin\\\\NadeLauncher.dll) — 리눅스에서 경로가 깨짐",
+    "  cs2bhop          우리 것 (cs2kr-plugins/cs2bhop-metamod)",
+    "  CS2KR-Core       우리 것 (CS2KR/CS2KR-Core) — 옛 이름 CS2.KR",
+    "  GoSpec           2026-07-10 사용자 지시로 서버에서 삭제",
+    "  KitsuneMenu      릴리스 없음"
+  ],
+  "plugins": [
+    {
+      "name": "Clientprefs",
+      "repo": "Cruze03/Clientprefs",
+      "asset": "^Clientprefs.*\\.zip$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "addons/counterstrikesharp/plugins/Clientprefs",
+          "to": "addons/counterstrikesharp/plugins/Clientprefs"
+        },
+        {
+          "from": "addons/counterstrikesharp/shared/ClientprefsApi",
+          "to": "addons/counterstrikesharp/shared/ClientprefsApi"
+        }
+      ],
+      "framework": "css",
+      "env": "PLUGIN_CLIENTPREFS"
+    },
+    {
+      "name": "CS2MenuManager_MenuManager",
+      "repo": "schwarper/CS2MenuManager",
+      "asset": "^CS2MenuManager-.*\\.zip$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "plugins/CS2MenuManager_MenuManager",
+          "to": "addons/counterstrikesharp/plugins/CS2MenuManager_MenuManager"
+        },
+        {
+          "from": "shared/CS2MenuManager",
+          "to": "addons/counterstrikesharp/shared/CS2MenuManager"
+        }
+      ],
+      "framework": "css",
+      "env": "PLUGIN_CS2MENUMANAGER_MENUMANAGER"
+    },
+    {
+      "name": "ResourcePrecacher",
+      "repo": "KillStr3aK/ResourcePrecacher",
+      "asset": "^ResourcePrecacher\\.zip$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "ResourcePrecacher/addons/counterstrikesharp/plugins/ResourcePrecacher",
+          "to": "addons/counterstrikesharp/plugins/ResourcePrecacher"
+        },
+        {
+          "from": "ResourcePrecacher/addons/counterstrikesharp/shared/ValvePak",
+          "to": "addons/counterstrikesharp/shared/ValvePak"
+        },
+        {
+          "from": "ResourcePrecacher/addons/counterstrikesharp/configs/plugins/ResourcePrecacher",
+          "to": "addons/counterstrikesharp/configs/plugins/ResourcePrecacher",
+          "preserve": true
+        }
+      ],
+      "framework": "css",
+      "env": "PLUGIN_RESOURCEPRECACHER"
+    },
+    {
+      "name": "CS2-CustomIO",
+      "repo": "darkerz7/CS2-CustomIO",
+      "asset": "^CS2-CustomIO-.*\\.zip$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "plugins/CS2-CustomIO",
+          "to": "addons/counterstrikesharp/plugins/CS2-CustomIO"
+        },
+        {
+          "from": "gamedata",
+          "to": "addons/counterstrikesharp/gamedata"
+        }
+      ],
+      "framework": "css",
+      "env": "PLUGIN_CS2_CUSTOMIO"
+    },
+    {
+      "name": "MatchZy",
+      "repo": "shobhit-pathak/MatchZy",
+      "asset": "^MatchZy-[0-9.]+\\.zip$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "addons/counterstrikesharp/plugins/MatchZy",
+          "to": "addons/counterstrikesharp/plugins/MatchZy"
+        },
+        {
+          "from": "cfg/MatchZy",
+          "to": "cfg/MatchZy",
+          "preserve": true
+        }
+      ],
+      "framework": "css",
+      "env": "PLUGIN_MATCHZY"
+    },
+    {
+      "name": "CS2-GameHUD",
+      "repo": "darkerz7/CS2-GameHUD",
+      "asset": "^CS2-GameHUD-.*\\.zip$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "plugins/CS2-GameHUD",
+          "to": "addons/counterstrikesharp/plugins/CS2-GameHUD"
+        },
+        {
+          "from": "shared/CS2-GameHUDAPI",
+          "to": "addons/counterstrikesharp/shared/CS2-GameHUDAPI"
+        }
+      ],
+      "framework": "css",
+      "env": "PLUGIN_CS2_GAMEHUD"
+    },
+    {
+      "name": "cs2kz",
+      "detect": "addons/cs2kz",
+      "repo": "KZGlobalTeam/cs2kz-metamod",
+      "asset": "^cs2kz-linux-master-upgrade\\.tar\\.gz$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "addons/cs2kz",
+          "to": "addons/cs2kz"
+        },
+        {
+          "from": "addons/metamod",
+          "to": "addons/metamod"
+        },
+        {
+          "from": "cfg",
+          "to": "cfg",
+          "preserve": true
+        }
+      ],
+      "framework": "metamod",
+      "env": "PLUGIN_CS2KZ"
+    },
+    {
+      "name": "cs2surf",
+      "detect": "addons/cs2surf",
+      "repo": "rcnoob/cs2surf-metamod",
+      "asset": "^cs2surf-linux-master-upgrade\\.tar\\.gz$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "addons/cs2surf",
+          "to": "addons/cs2surf"
+        },
+        {
+          "from": "addons/metamod",
+          "to": "addons/metamod"
+        },
+        {
+          "from": "cfg",
+          "to": "cfg",
+          "preserve": true
+        }
+      ],
+      "framework": "metamod",
+      "env": "PLUGIN_CS2SURF"
+    },
+    {
+      "name": "sql_mm",
+      "detect": "addons/sql_mm",
+      "repo": "zer0k-z/sql_mm",
+      "asset": "^package-linux\\.tar\\.gz$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "addons/sql_mm",
+          "to": "addons/sql_mm"
+        },
+        {
+          "from": "addons/metamod",
+          "to": "addons/metamod"
+        }
+      ],
+      "framework": "metamod",
+      "env": "PLUGIN_SQL_MM"
+    },
+    {
+      "name": "cs2menus",
+      "detect": "addons/cs2menus",
+      "repo": "FemboyKZ/mm-cs2menus",
+      "asset": "^cs2menus-.*-linux\\.zip$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "addons/cs2menus",
+          "to": "addons/cs2menus"
+        },
+        {
+          "from": "addons/metamod",
+          "to": "addons/metamod"
+        },
+        {
+          "from": "cfg/cs2menus",
+          "to": "cfg/cs2menus",
+          "preserve": true
+        }
+      ],
+      "framework": "metamod",
+      "env": "PLUGIN_CS2MENUS"
+    },
+    {
+      "name": "multiaddonmanager",
+      "detect": "addons/multiaddonmanager",
+      "repo": "Source2ZE/MultiAddonManager",
+      "asset": "-linux\\.tar\\.gz$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "addons/multiaddonmanager",
+          "to": "addons/multiaddonmanager"
+        },
+        {
+          "from": "addons/metamod",
+          "to": "addons/metamod"
+        },
+        {
+          "from": "cfg/multiaddonmanager",
+          "to": "cfg/multiaddonmanager",
+          "preserve": true
+        }
+      ],
+      "framework": "metamod",
+      "env": "PLUGIN_MULTIADDONMANAGER"
+    },
+    {
+      "name": "serverlistplayersfix_mm",
+      "detect": "addons/serverlistplayersfix_mm",
+      "repo": "Source2ZE/ServerListPlayersFix",
+      "asset": "-linux\\.tar\\.gz$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "addons/serverlistplayersfix_mm",
+          "to": "addons/serverlistplayersfix_mm"
+        },
+        {
+          "from": "addons/metamod",
+          "to": "addons/metamod"
+        }
+      ],
+      "framework": "metamod",
+      "env": "PLUGIN_SERVERLISTPLAYERSFIX_MM"
+    },
+    {
+      "name": "client_cvar_value",
+      "detect": "addons/client_cvar_value",
+      "repo": "komashchenko/ClientCvarValue",
+      "asset": "^linux\\.zip$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "addons/client_cvar_value",
+          "to": "addons/client_cvar_value"
+        },
+        {
+          "from": "addons/metamod",
+          "to": "addons/metamod"
+        }
+      ],
+      "framework": "metamod",
+      "env": "PLUGIN_CLIENT_CVAR_VALUE"
+    },
+    {
+      "name": "StripperCS2",
+      "detect": "addons/StripperCS2",
+      "repo": "Source2ZE/StripperCS2",
+      "asset": "^StripperCS2-.*\\.zip$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "addons/StripperCS2",
+          "to": "addons/StripperCS2"
+        },
+        {
+          "from": "addons/metamod",
+          "to": "addons/metamod"
+        }
+      ],
+      "framework": "metamod",
+      "env": "PLUGIN_STRIPPERCS2"
+    },
+    {
+      "name": "cs2fixes",
+      "detect": "addons/cs2fixes",
+      "repo": "Source2ZE/CS2Fixes",
+      "asset": "-linux\\.tar\\.gz$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "addons/cs2fixes",
+          "to": "addons/cs2fixes"
+        },
+        {
+          "from": "addons/metamod",
+          "to": "addons/metamod"
+        },
+        {
+          "from": "cfg/cs2fixes",
+          "to": "cfg/cs2fixes",
+          "preserve": true
+        },
+        {
+          "from": "materials/cs2fixes",
+          "to": "materials/cs2fixes"
+        },
+        {
+          "from": "particles/cs2fixes",
+          "to": "particles/cs2fixes"
+        },
+        {
+          "from": "soundevents",
+          "to": "soundevents"
+        },
+        {
+          "from": "sounds",
+          "to": "sounds"
+        }
+      ],
+      "framework": "metamod",
+      "env": "PLUGIN_CS2FIXES"
+    },
+    {
+      "name": "WeaponSkins",
+      "detect": "addons/swiftlys2/plugins/WeaponSkins",
+      "repo": "samyycX/WeaponSkins",
+      "asset": "^WeaponSkins-v.*\\.zip$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "WeaponSkins",
+          "to": "addons/swiftlys2/plugins/WeaponSkins"
+        }
+      ],
+      "framework": "swiftly",
+      "env": "PLUGIN_WEAPONSKINS"
+    }
+  ]
+}

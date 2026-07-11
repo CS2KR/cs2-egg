@@ -237,6 +237,166 @@
             "user_editable": true,
             "rules": "required|boolean",
             "field_type": "text"
+        },
+        {
+            "name": "플러그인: Clientprefs",
+            "description": "1 이면 이 서버에 Clientprefs 을(를) 설치하고 기동할 때 최신으로 갱신합니다. CounterStrikeSharp 플러그인이라 INSTALL_CSS=1 일 때만 설치됩니다.",
+            "env_variable": "PLUGIN_CLIENTPREFS",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "플러그인: CS2MenuManager_MenuManager",
+            "description": "1 이면 이 서버에 CS2MenuManager_MenuManager 을(를) 설치하고 기동할 때 최신으로 갱신합니다. CounterStrikeSharp 플러그인이라 INSTALL_CSS=1 일 때만 설치됩니다.",
+            "env_variable": "PLUGIN_CS2MENUMANAGER_MENUMANAGER",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "플러그인: ResourcePrecacher",
+            "description": "1 이면 이 서버에 ResourcePrecacher 을(를) 설치하고 기동할 때 최신으로 갱신합니다. CounterStrikeSharp 플러그인이라 INSTALL_CSS=1 일 때만 설치됩니다.",
+            "env_variable": "PLUGIN_RESOURCEPRECACHER",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "플러그인: CS2-CustomIO",
+            "description": "1 이면 이 서버에 CS2-CustomIO 을(를) 설치하고 기동할 때 최신으로 갱신합니다. CounterStrikeSharp 플러그인이라 INSTALL_CSS=1 일 때만 설치됩니다.",
+            "env_variable": "PLUGIN_CS2_CUSTOMIO",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "플러그인: MatchZy",
+            "description": "1 이면 이 서버에 MatchZy 을(를) 설치하고 기동할 때 최신으로 갱신합니다. CounterStrikeSharp 플러그인이라 INSTALL_CSS=1 일 때만 설치됩니다.",
+            "env_variable": "PLUGIN_MATCHZY",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "플러그인: CS2-GameHUD",
+            "description": "1 이면 이 서버에 CS2-GameHUD 을(를) 설치하고 기동할 때 최신으로 갱신합니다. CounterStrikeSharp 플러그인이라 INSTALL_CSS=1 일 때만 설치됩니다.",
+            "env_variable": "PLUGIN_CS2_GAMEHUD",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "플러그인: cs2kz",
+            "description": "1 이면 이 서버에 cs2kz 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
+            "env_variable": "PLUGIN_CS2KZ",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "플러그인: cs2surf",
+            "description": "1 이면 이 서버에 cs2surf 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
+            "env_variable": "PLUGIN_CS2SURF",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "플러그인: sql_mm",
+            "description": "1 이면 이 서버에 sql_mm 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
+            "env_variable": "PLUGIN_SQL_MM",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "플러그인: cs2menus",
+            "description": "1 이면 이 서버에 cs2menus 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
+            "env_variable": "PLUGIN_CS2MENUS",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "플러그인: multiaddonmanager",
+            "description": "1 이면 이 서버에 multiaddonmanager 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
+            "env_variable": "PLUGIN_MULTIADDONMANAGER",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "플러그인: serverlistplayersfix_mm",
+            "description": "1 이면 이 서버에 serverlistplayersfix_mm 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
+            "env_variable": "PLUGIN_SERVERLISTPLAYERSFIX_MM",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "플러그인: client_cvar_value",
+            "description": "1 이면 이 서버에 client_cvar_value 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
+            "env_variable": "PLUGIN_CLIENT_CVAR_VALUE",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "플러그인: StripperCS2",
+            "description": "1 이면 이 서버에 StripperCS2 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
+            "env_variable": "PLUGIN_STRIPPERCS2",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "플러그인: cs2fixes",
+            "description": "1 이면 이 서버에 cs2fixes 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
+            "env_variable": "PLUGIN_CS2FIXES",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "플러그인: WeaponSkins",
+            "description": "1 이면 이 서버에 WeaponSkins 을(를) 설치하고 기동할 때 최신으로 갱신합니다. SwiftlyS2 플러그인이라 INSTALL_SWIFTLY=1 일 때만 설치됩니다.",
+            "env_variable": "PLUGIN_WEAPONSKINS",
+            "default_value": "1",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
         }
     ]
 }

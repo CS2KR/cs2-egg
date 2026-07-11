@@ -1,20 +1,23 @@
 #!/bin/bash
-# CS2 기동 직전에 egg/configs/plugins.json 기준으로 서드파티 플러그인을 GitHub 최신 릴리스로 갱신한다
-# (CounterStrikeSharp 플러그인 + Metamod 애드온. Metamod:Source 본체와 CSS 본체는 egg 가 따로 갱신한다)
+# CS2 기동 직전에 서드파티 플러그인을 GitHub 최신 릴리스로 갱신·설치한다.
+# 플러그인 목록은 이미지에 구운 카탈로그(/scripts/plugins-catalog.json)를 쓰고,
+# 무엇을 켤지는 egg 변수로 정한다 — 각 플러그인의 PLUGIN_<NAME>(0/1) + 프레임워크
+# 게이팅(metamod=INSTALL_METAMOD, css=INSTALL_CSS, swiftly=INSTALL_SWIFTLY 가 1일 때만).
+# Metamod:Source 본체와 CSS/SwiftlyS2 본체는 egg 가 따로 갱신한다.
 
 set -uo pipefail
 
 CONTAINER_DIR="${CONTAINER_DIR:-/home/container}"
 GAME_DIR="$CONTAINER_DIR/game/csgo"
 EGG_DIR="$CONTAINER_DIR/egg"
-MANIFEST="$EGG_DIR/configs/plugins.json"
+CATALOG="${PLUGIN_CATALOG:-/scripts/plugins-catalog.json}"
 VERSION_FILE="$EGG_DIR/plugin-versions.txt"
 DRY_RUN="${PLUGIN_UPDATE_DRY_RUN:-0}"
 API="${GITHUB_API:-https://api.github.com}"
 
 log() { printf '[plugin-update] %s\n' "$*"; }
 
-[ -f "$MANIFEST" ] || { log "manifest 없음 ($MANIFEST) — 건너뜁니다"; exit 0; }
+[ -f "$CATALOG" ] || { log "카탈로그 없음 ($CATALOG) — 건너뜁니다"; exit 0; }
 for t in jq curl unzip tar rsync; do
     command -v "$t" >/dev/null || { log "$t 없음 — 건너뜁니다"; exit 0; }
 done
@@ -112,15 +115,36 @@ updated=0 skipped=0 failed=0 ratelimited=0
 while IFS= read -r spec; do
     name=$(jq -r '.name' <<<"$spec")
 
-    # `.enabled // true` 로 쓰면 enabled:false 가 true 로 바뀐다 (jq 의 // 는 false 도 대체한다)
+    # 카탈로그 레벨 킬 스위치 (`.enabled // true` 는 false 를 true 로 뒤집으니 != false 로).
     if [ "$(jq -r '.enabled != false' <<<"$spec")" != "true" ]; then
-        log "$name: 비활성"
+        log "$name: 카탈로그에서 비활성"
         continue
     fi
 
-    # manifest 에 활성화된 플러그인은 없으면 설치하고 있으면 갱신한다(선언적 데지어드 상태).
-    # 서버가 무엇을 가질지는 manifest(plugins.json)가 정한다 — deploy.sh 가 서버별로 생성.
-    # apply_plugin 이 map 대상에 그대로 추출하므로 설치와 갱신은 같은 경로다.
+    # 프레임워크 게이팅 — 해당 프레임워크가 꺼져 있으면 이 플러그인은 설치하지 않는다.
+    framework=$(jq -r '.framework // "css"' <<<"$spec")
+    case "$framework" in
+        metamod) fw_on="${INSTALL_METAMOD:-0}" ;;
+        css)     fw_on="${INSTALL_CSS:-0}" ;;
+        swiftly) fw_on="${INSTALL_SWIFTLY:-0}" ;;
+        *)       fw_on=0 ;;
+    esac
+    if [ "$fw_on" != "1" ]; then
+        log "$name: $framework 프레임워크 꺼짐 — 건너뜁니다"
+        continue
+    fi
+
+    # 플러그인별 egg 변수(PLUGIN_<NAME>)로 서버별 on/off. 1 이 아니면 설치·갱신 안 함.
+    env=$(jq -r '.env // empty' <<<"$spec")
+    plugin_on=0
+    [ -n "$env" ] && plugin_on="${!env:-0}"
+    if [ "$plugin_on" != "1" ]; then
+        log "$name: 꺼짐 (${env:-env없음}=$plugin_on) — 건너뜁니다"
+        continue
+    fi
+
+    # 여기까지 왔으면 이 서버에서 켠 플러그인. 없으면 새로 설치하고 있으면 안전 갱신한다.
+    # apply_plugin 이 map 대상에 rsync 병합하므로 설치와 갱신은 같은 경로다.
     detect=$(jq -r '.detect // ("addons/counterstrikesharp/plugins/" + .name)' <<<"$spec")
     if [ ! -e "$GAME_DIR/$detect" ]; then
         log "$name: 미설치 — 새로 설치합니다"
@@ -177,7 +201,7 @@ while IFS= read -r spec; do
     else
         failed=$((failed + 1))
     fi
-done < <(jq -c '.plugins[]' "$MANIFEST")
+done < <(jq -c '.plugins[]' "$CATALOG")
 
 log "갱신 $updated · 최신 $skipped · 실패 $failed"
 [ "$failed" -eq 0 ] && [ "$ratelimited" -eq 0 ]
