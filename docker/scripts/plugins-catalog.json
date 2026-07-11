@@ -93,7 +93,7 @@
       "name": "cs2bhop-metamod",
       "detect": "addons/cs2bhop",
       "repo": "CS2KR/cs2bhop-metamod",
-      "asset": "^cs2bhop-.*-upgrade\\.zip$",
+      "asset": "^cs2bhop-linux-.*-upgrade\\.zip$",
       "enabled": true,
       "map": [
         {
