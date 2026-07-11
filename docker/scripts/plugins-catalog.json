@@ -52,24 +52,6 @@
       "env": "PLUGIN_CLIENTPREFS"
     },
     {
-      "name": "CS2MenuManager_MenuManager",
-      "repo": "schwarper/CS2MenuManager",
-      "asset": "^CS2MenuManager-.*\\.zip$",
-      "enabled": true,
-      "map": [
-        {
-          "from": "plugins/CS2MenuManager_MenuManager",
-          "to": "addons/counterstrikesharp/plugins/CS2MenuManager_MenuManager"
-        },
-        {
-          "from": "shared/CS2MenuManager",
-          "to": "addons/counterstrikesharp/shared/CS2MenuManager"
-        }
-      ],
-      "framework": "css",
-      "env": "PLUGIN_CS2MENUMANAGER_MENUMANAGER"
-    },
-    {
       "name": "ResourcePrecacher",
       "repo": "KillStr3aK/ResourcePrecacher",
       "asset": "^ResourcePrecacher\\.zip$",
@@ -94,21 +76,33 @@
     },
     {
       "name": "CS2-CustomIO",
-      "repo": "darkerz7/CS2-CustomIO",
-      "asset": "^CS2-CustomIO-.*\\.zip$",
+      "detect": "addons/swiftlys2/plugins/cs2-CustomIO",
+      "repo": "himenekocn/CS2-CustomIO-For-SW2",
+      "asset": "^cs2-CustomIO\\.zip$",
       "enabled": true,
       "map": [
         {
-          "from": "plugins/CS2-CustomIO",
-          "to": "addons/counterstrikesharp/plugins/CS2-CustomIO"
-        },
-        {
-          "from": "gamedata",
-          "to": "addons/counterstrikesharp/gamedata"
+          "from": ".",
+          "to": "addons/swiftlys2/plugins/cs2-CustomIO"
         }
       ],
-      "framework": "css",
+      "framework": "swiftly",
       "env": "PLUGIN_CS2_CUSTOMIO"
+    },
+    {
+      "name": "cs2bhop-metamod",
+      "detect": "addons/cs2bhop",
+      "repo": "CS2KR/cs2bhop-metamod",
+      "asset": "^cs2bhop-.*-upgrade\\.zip$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "addons",
+          "to": "addons"
+        }
+      ],
+      "framework": "metamod",
+      "env": "PLUGIN_CS2BHOP"
     },
     {
       "name": "MatchZy",

@@ -74,7 +74,11 @@ apply_plugin() {
     local from to preserve
 
     mkdir -p "$stage" "$bak"
-    curl -fsSL -m 300 -A "Mozilla/5.0" -o "$work/pkg" "$url" || { log "$name: 다운로드 실패"; return 1; }
+    # 비공개 레포(CS2KR/*) 에셋은 토큰 인증이 필요하다. github.com 이 인증 후 pre-signed S3 로
+    # 리다이렉트하고, curl 은 교차 호스트 리다이렉트에 Authorization 을 넘기지 않으므로 안전하다.
+    local dl_auth=()
+    [ -n "${GITHUB_TOKEN:-}" ] && dl_auth=(-H "Authorization: Bearer $GITHUB_TOKEN")
+    curl -fsSL -m 300 -A "Mozilla/5.0" "${dl_auth[@]}" -o "$work/pkg" "$url" || { log "$name: 다운로드 실패"; return 1; }
     [ -s "$work/pkg" ] || { log "$name: 받은 파일이 비어 있음"; return 1; }
     extract "$work/pkg" "$stage" || { log "$name: 압축 해제 실패"; return 1; }
 
@@ -113,6 +117,16 @@ apply_plugin() {
     fi
     return 0
 }
+
+# 폐기된 플러그인 경로 정리 — 교체·이전으로 더는 쓰지 않는 것들.
+# CS2-CustomIO 는 CSS 판(darkerz7)에서 SwiftlyS2 판(himenekocn/CS2-CustomIO-For-SW2)으로 교체됐다.
+# 옛 CSS 판이 남아 있으면 WeaponSkins 의 SetBodygroup 입력과 충돌해 스폰 때 서버가 하드 크래시한다.
+for rel in "addons/counterstrikesharp/plugins/CS2-CustomIO"; do
+    if [ -e "$GAME_DIR/$rel" ]; then
+        log "폐기 플러그인 제거: $rel"
+        rm -rf "${GAME_DIR:?}/$rel"
+    fi
+done
 
 updated=0 skipped=0 failed=0 ratelimited=0
 
