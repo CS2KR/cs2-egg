@@ -118,11 +118,12 @@ while IFS= read -r spec; do
         continue
     fi
 
-    # 이미 설치된 것만 갱신한다. manifest 가 낡아도 없던 플러그인이 새로 깔리지 않는다.
+    # manifest 에 활성화된 플러그인은 없으면 설치하고 있으면 갱신한다(선언적 데지어드 상태).
+    # 서버가 무엇을 가질지는 manifest(plugins.json)가 정한다 — deploy.sh 가 서버별로 생성.
+    # apply_plugin 이 map 대상에 그대로 추출하므로 설치와 갱신은 같은 경로다.
     detect=$(jq -r '.detect // ("addons/counterstrikesharp/plugins/" + .name)' <<<"$spec")
     if [ ! -e "$GAME_DIR/$detect" ]; then
-        log "$name: 미설치 — 건너뜁니다"
-        continue
+        log "$name: 미설치 — 새로 설치합니다"
     fi
 
     repo=$(jq -r '.repo' <<<"$spec")
