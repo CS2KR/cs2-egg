@@ -22,7 +22,11 @@ for t in jq curl unzip tar rsync; do
     command -v "$t" >/dev/null || { log "$t 없음 — 건너뜁니다"; exit 0; }
 done
 
-TMP=$(mktemp -d) || { log "임시 디렉터리 생성 실패 — 건너뜁니다"; exit 0; }
+# /tmp 은 컨테이너에서 작은 tmpfs(100MB)라, WeaponSkins 같은 큰 zip(33MB+압축해제)이 누적되면
+# 넘쳐 curl 23(쓰기 실패)이 난다. 넉넉한 볼륨(/home/container)에 임시 디렉터리를 만든다.
+mkdir -p "$EGG_DIR" 2>/dev/null
+TMP=$(mktemp -d "$EGG_DIR/.plugin-update.XXXXXX" 2>/dev/null) || TMP=$(mktemp -d) \
+    || { log "임시 디렉터리 생성 실패 — 건너뜁니다"; exit 0; }
 trap 'rm -rf "$TMP"' EXIT
 
 # 응답 본문을 $2 에 쓰고 HTTP 상태 코드를 찍는다.
