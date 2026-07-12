@@ -229,77 +229,7 @@
       "field_type": "text"
     },
     {
-      "name": "플러그인: CS2-CustomIO",
-      "description": "1 이면 이 서버에 CS2-CustomIO(SwiftlyS2 판)를 설치/갱신합니다. SwiftlyS2 플러그인이라 INSTALL_SWIFTLY=1 일 때만 설치됩니다.",
-      "env_variable": "PLUGIN_CS2_CUSTOMIO",
-      "default_value": "0",
-      "user_viewable": true,
-      "user_editable": true,
-      "rules": "required|boolean",
-      "field_type": "text"
-    },
-    {
-      "name": "플러그인: cs2kz",
-      "description": "1 이면 이 서버에 cs2kz 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
-      "env_variable": "PLUGIN_CS2KZ",
-      "default_value": "0",
-      "user_viewable": true,
-      "user_editable": true,
-      "rules": "required|boolean",
-      "field_type": "text"
-    },
-    {
-      "name": "플러그인: cs2surf",
-      "description": "1 이면 이 서버에 cs2surf 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
-      "env_variable": "PLUGIN_CS2SURF",
-      "default_value": "0",
-      "user_viewable": true,
-      "user_editable": true,
-      "rules": "required|boolean",
-      "field_type": "text"
-    },
-    {
-      "name": "플러그인: sql_mm",
-      "description": "1 이면 이 서버에 sql_mm 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
-      "env_variable": "PLUGIN_SQL_MM",
-      "default_value": "0",
-      "user_viewable": true,
-      "user_editable": true,
-      "rules": "required|boolean",
-      "field_type": "text"
-    },
-    {
-      "name": "플러그인: cs2menus",
-      "description": "1 이면 이 서버에 cs2menus 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
-      "env_variable": "PLUGIN_CS2MENUS",
-      "default_value": "0",
-      "user_viewable": true,
-      "user_editable": true,
-      "rules": "required|boolean",
-      "field_type": "text"
-    },
-    {
-      "name": "플러그인: multiaddonmanager",
-      "description": "1 이면 이 서버에 multiaddonmanager 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
-      "env_variable": "PLUGIN_MULTIADDONMANAGER",
-      "default_value": "0",
-      "user_viewable": true,
-      "user_editable": true,
-      "rules": "required|boolean",
-      "field_type": "text"
-    },
-    {
-      "name": "플러그인: serverlistplayersfix_mm",
-      "description": "1 이면 이 서버에 serverlistplayersfix_mm 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
-      "env_variable": "PLUGIN_SERVERLISTPLAYERSFIX_MM",
-      "default_value": "0",
-      "user_viewable": true,
-      "user_editable": true,
-      "rules": "required|boolean",
-      "field_type": "text"
-    },
-    {
-      "name": "플러그인: client_cvar_value",
+      "name": "[MetaMod] client_cvar_value",
       "description": "1 이면 이 서버에 client_cvar_value 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
       "env_variable": "PLUGIN_CLIENT_CVAR_VALUE",
       "default_value": "0",
@@ -309,9 +239,9 @@
       "field_type": "text"
     },
     {
-      "name": "플러그인: StripperCS2",
-      "description": "1 이면 이 서버에 StripperCS2 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
-      "env_variable": "PLUGIN_STRIPPERCS2",
+      "name": "[MetaMod] cs2bhop 타이머",
+      "description": "1 이면 이 서버에 cs2bhop(버니합 타이머) Metamod 플러그인을 설치/갱신합니다(업그레이드는 upgrade.zip). 버니합 서버만 1 로 두세요. INSTALL_METAMOD=1 일 때만 설치됩니다.",
+      "env_variable": "PLUGIN_CS2BHOP",
       "default_value": "0",
       "user_viewable": true,
       "user_editable": true,
@@ -319,7 +249,7 @@
       "field_type": "text"
     },
     {
-      "name": "플러그인: cs2fixes",
+      "name": "[MetaMod] cs2fixes",
       "description": "1 이면 이 서버에 cs2fixes 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
       "env_variable": "PLUGIN_CS2FIXES",
       "default_value": "0",
@@ -329,9 +259,9 @@
       "field_type": "text"
     },
     {
-      "name": "플러그인: zResourcePrecacher",
-      "description": "1 이면 이 서버에 zResourcePrecacher 을(를) 설치하고 기동할 때 최신으로 갱신합니다. SwiftlyS2 플러그인이라 INSTALL_SWIFTLY=1 일 때만 설치됩니다.",
-      "env_variable": "PLUGIN_ZRESOURCEPRECACHER",
+      "name": "[MetaMod] cs2kz",
+      "description": "1 이면 이 서버에 cs2kz 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
+      "env_variable": "PLUGIN_CS2KZ",
       "default_value": "0",
       "user_viewable": true,
       "user_editable": true,
@@ -339,7 +269,77 @@
       "field_type": "text"
     },
     {
-      "name": "플러그인: WeaponSkins",
+      "name": "[MetaMod] cs2menus",
+      "description": "1 이면 이 서버에 cs2menus 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
+      "env_variable": "PLUGIN_CS2MENUS",
+      "default_value": "0",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|boolean",
+      "field_type": "text"
+    },
+    {
+      "name": "[MetaMod] cs2surf",
+      "description": "1 이면 이 서버에 cs2surf 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
+      "env_variable": "PLUGIN_CS2SURF",
+      "default_value": "0",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|boolean",
+      "field_type": "text"
+    },
+    {
+      "name": "[MetaMod] multiaddonmanager",
+      "description": "1 이면 이 서버에 multiaddonmanager 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
+      "env_variable": "PLUGIN_MULTIADDONMANAGER",
+      "default_value": "0",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|boolean",
+      "field_type": "text"
+    },
+    {
+      "name": "[MetaMod] serverlistplayersfix_mm",
+      "description": "1 이면 이 서버에 serverlistplayersfix_mm 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
+      "env_variable": "PLUGIN_SERVERLISTPLAYERSFIX_MM",
+      "default_value": "0",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|boolean",
+      "field_type": "text"
+    },
+    {
+      "name": "[MetaMod] sql_mm",
+      "description": "1 이면 이 서버에 sql_mm 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
+      "env_variable": "PLUGIN_SQL_MM",
+      "default_value": "0",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|boolean",
+      "field_type": "text"
+    },
+    {
+      "name": "[MetaMod] StripperCS2",
+      "description": "1 이면 이 서버에 StripperCS2 을(를) 설치하고 기동할 때 최신으로 갱신합니다. MetaMod 플러그인이라 INSTALL_METAMOD=1 일 때만 설치됩니다.",
+      "env_variable": "PLUGIN_STRIPPERCS2",
+      "default_value": "0",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|boolean",
+      "field_type": "text"
+    },
+    {
+      "name": "[SwiftlyS2] CS2-CustomIO",
+      "description": "1 이면 이 서버에 CS2-CustomIO(SwiftlyS2 판)를 설치/갱신합니다. SwiftlyS2 플러그인이라 INSTALL_SWIFTLY=1 일 때만 설치됩니다.",
+      "env_variable": "PLUGIN_CS2_CUSTOMIO",
+      "default_value": "0",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|boolean",
+      "field_type": "text"
+    },
+    {
+      "name": "[SwiftlyS2] WeaponSkins",
       "description": "1 이면 이 서버에 WeaponSkins 을(를) 설치하고 기동할 때 최신으로 갱신합니다. SwiftlyS2 플러그인이라 INSTALL_SWIFTLY=1 일 때만 설치됩니다. 켜면 egg 가 SwiftlyS2 core.jsonc 의 FollowCS2ServerGuidelines 를 false 로 맞춥니다 (스킨 적용에 필요).",
       "env_variable": "PLUGIN_WEAPONSKINS",
       "default_value": "1",
@@ -349,9 +349,9 @@
       "field_type": "text"
     },
     {
-      "name": "플러그인: cs2bhop 타이머",
-      "description": "1 이면 이 서버에 cs2bhop(버니합 타이머) Metamod 플러그인을 설치/갱신합니다(업그레이드는 upgrade.zip). 버니합 서버만 1 로 두세요. INSTALL_METAMOD=1 일 때만 설치됩니다.",
-      "env_variable": "PLUGIN_CS2BHOP",
+      "name": "[SwiftlyS2] zResourcePrecacher",
+      "description": "1 이면 이 서버에 zResourcePrecacher 을(를) 설치하고 기동할 때 최신으로 갱신합니다. SwiftlyS2 플러그인이라 INSTALL_SWIFTLY=1 일 때만 설치됩니다.",
+      "env_variable": "PLUGIN_ZRESOURCEPRECACHER",
       "default_value": "0",
       "user_viewable": true,
       "user_editable": true,
