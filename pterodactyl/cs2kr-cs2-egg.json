@@ -130,7 +130,7 @@
     },
     {
       "name": "MetaMod:Source 자동설치",
-      "description": "1 이면 기동할 때 MetaMod:Source 를 최신으로 갱신합니다. CounterStrikeSharp 의 전제 조건이라, CSS 를 켜면 자동으로 함께 켜집니다.",
+      "description": "1 이면 기동할 때 MetaMod:Source 를 최신으로 갱신합니다. MetaMod 플러그인(cs2kz, cs2fixes, cs2bhop …)의 전제 조건입니다.",
       "env_variable": "INSTALL_METAMOD",
       "default_value": "0",
       "user_viewable": true,
@@ -139,18 +139,8 @@
       "field_type": "text"
     },
     {
-      "name": "CounterStrikeSharp 자동설치",
-      "description": "1 이면 기동할 때 CounterStrikeSharp 를 최신으로 갱신합니다. MetaMod:Source 가 필요합니다.",
-      "env_variable": "INSTALL_CSS",
-      "default_value": "0",
-      "user_viewable": true,
-      "user_editable": true,
-      "rules": "required|boolean",
-      "field_type": "text"
-    },
-    {
       "name": "SwiftlyS2 자동설치",
-      "description": "1 이면 기동할 때 SwiftlyS2 를 최신으로 갱신합니다. MetaMod 없이 단독으로 도는 C# 프레임워크이며, CounterStrikeSharp 와 함께 쓰면 충돌할 수 있습니다.",
+      "description": "1 이면 기동할 때 SwiftlyS2 를 최신으로 갱신합니다. MetaMod 없이 단독으로 도는 C# 프레임워크입니다.",
       "env_variable": "INSTALL_SWIFTLY",
       "default_value": "1",
       "user_viewable": true,
@@ -160,7 +150,7 @@
     },
     {
       "name": "ModSharp 자동설치",
-      "description": "1 이면 기동할 때 ModSharp 를 최신으로 갱신합니다. 단독으로 도는 C# 플랫폼이며, CounterStrikeSharp·SwiftlyS2 와 함께 쓰면 충돌할 수 있습니다.",
+      "description": "1 이면 기동할 때 ModSharp 를 최신으로 갱신합니다. 단독으로 도는 C# 플랫폼이며, SwiftlyS2 와 함께 쓰면 충돌할 수 있습니다.",
       "env_variable": "INSTALL_MODSHARP",
       "default_value": "0",
       "user_viewable": true,
@@ -170,7 +160,7 @@
     },
     {
       "name": "프리릴리스 허용",
-      "description": "1 이면 MetaMod·CounterStrikeSharp 등 프레임워크의 프리릴리스·베타를 내려받습니다. 불안정할 수 있습니다.",
+      "description": "1 이면 MetaMod·SwiftlyS2 등 프레임워크의 프리릴리스·베타를 내려받습니다. 불안정할 수 있습니다.",
       "env_variable": "PRERELEASE",
       "default_value": "0",
       "user_viewable": true,
@@ -239,49 +229,9 @@
       "field_type": "text"
     },
     {
-      "name": "플러그인: Clientprefs",
-      "description": "1 이면 이 서버에 Clientprefs 을(를) 설치하고 기동할 때 최신으로 갱신합니다. CounterStrikeSharp 플러그인이라 INSTALL_CSS=1 일 때만 설치됩니다.",
-      "env_variable": "PLUGIN_CLIENTPREFS",
-      "default_value": "0",
-      "user_viewable": true,
-      "user_editable": true,
-      "rules": "required|boolean",
-      "field_type": "text"
-    },
-    {
-      "name": "플러그인: ResourcePrecacher",
-      "description": "1 이면 이 서버에 ResourcePrecacher 을(를) 설치하고 기동할 때 최신으로 갱신합니다. CounterStrikeSharp 플러그인이라 INSTALL_CSS=1 일 때만 설치됩니다.",
-      "env_variable": "PLUGIN_RESOURCEPRECACHER",
-      "default_value": "0",
-      "user_viewable": true,
-      "user_editable": true,
-      "rules": "required|boolean",
-      "field_type": "text"
-    },
-    {
       "name": "플러그인: CS2-CustomIO",
-      "description": "1 이면 이 서버에 CS2-CustomIO(SwiftlyS2 판)를 설치/갱신합니다. SwiftlyS2 플러그인이라 INSTALL_SWIFTLY=1 일 때만 설치됩니다. WeaponSkins 와 충돌하던 CSS 판을 대체합니다.",
+      "description": "1 이면 이 서버에 CS2-CustomIO(SwiftlyS2 판)를 설치/갱신합니다. SwiftlyS2 플러그인이라 INSTALL_SWIFTLY=1 일 때만 설치됩니다.",
       "env_variable": "PLUGIN_CS2_CUSTOMIO",
-      "default_value": "0",
-      "user_viewable": true,
-      "user_editable": true,
-      "rules": "required|boolean",
-      "field_type": "text"
-    },
-    {
-      "name": "플러그인: MatchZy",
-      "description": "1 이면 이 서버에 MatchZy 을(를) 설치하고 기동할 때 최신으로 갱신합니다. CounterStrikeSharp 플러그인이라 INSTALL_CSS=1 일 때만 설치됩니다.",
-      "env_variable": "PLUGIN_MATCHZY",
-      "default_value": "0",
-      "user_viewable": true,
-      "user_editable": true,
-      "rules": "required|boolean",
-      "field_type": "text"
-    },
-    {
-      "name": "플러그인: CS2-GameHUD",
-      "description": "1 이면 이 서버에 CS2-GameHUD 을(를) 설치하고 기동할 때 최신으로 갱신합니다. CounterStrikeSharp 플러그인이라 INSTALL_CSS=1 일 때만 설치됩니다.",
-      "env_variable": "PLUGIN_CS2_GAMEHUD",
       "default_value": "0",
       "user_viewable": true,
       "user_editable": true,

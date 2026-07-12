@@ -32,8 +32,9 @@ repair path. Details: [Centralized game files](#centralized-game-files-vpk-sync)
 plugins listed in the server's `egg/configs/plugins.json` to their latest GitHub release. The game server
 is not running yet, so there is no hot-reload to worry about and no players are online.
 
-It covers both CounterStrikeSharp plugins and native Metamod addons. Metamod:Source and CounterStrikeSharp
-themselves are already kept up to date by the upstream egg, so they are not managed here.
+It covers native Metamod addons and SwiftlyS2 plugins. Metamod:Source and SwiftlyS2 themselves are
+already kept up to date by the egg's framework updaters, so they are not managed here.
+CounterStrikeSharp support was dropped on 2026-07-12.
 
 Design rules, in order of importance:
 
@@ -60,13 +61,14 @@ Implementation: [`docker/scripts/plugin-update.sh`](docker/scripts/plugin-update
   "version": "1.0.0",
   "plugins": [
     {
-      "name": "WeaponPaints",
-      "repo": "Nereziel/cs2-WeaponPaints",
-      "asset": "^WeaponPaints\\.zip$",
+      "name": "WeaponSkins",
+      "detect": "addons/swiftlys2/plugins/WeaponSkins",
+      "repo": "samyycX/WeaponSkins",
+      "asset": "^WeaponSkins-v.*\\.zip$",
+      "framework": "swiftly",
       "enabled": true,
       "map": [
-        { "from": "WeaponPaints", "to": "addons/counterstrikesharp/plugins/WeaponPaints" },
-        { "from": "gamedata", "to": "addons/counterstrikesharp/gamedata" }
+        { "from": "WeaponSkins", "to": "addons/swiftlys2/plugins/WeaponSkins" }
       ]
     },
     {
@@ -74,6 +76,7 @@ Implementation: [`docker/scripts/plugin-update.sh`](docker/scripts/plugin-update
       "detect": "addons/cs2kz",
       "repo": "KZGlobalTeam/cs2kz-metamod",
       "asset": "^cs2kz-linux-master-upgrade\\.tar\\.gz$",
+      "framework": "metamod",
       "map": [
         { "from": "addons/cs2kz", "to": "addons/cs2kz" },
         { "from": "addons/metamod", "to": "addons/metamod" },
@@ -87,9 +90,10 @@ Implementation: [`docker/scripts/plugin-update.sh`](docker/scripts/plugin-update
 | Field | Meaning |
 |---|---|
 | `name` | Key used to record the installed version in `egg/plugin-versions.txt`. |
-| `detect` | Path relative to `game/csgo` that must exist for the plugin to be updated. Defaults to `addons/counterstrikesharp/plugins/<name>`. |
+| `detect` | Path relative to `game/csgo` that must exist for the plugin to be updated. Required. |
 | `repo` | GitHub `owner/repo`. Only `releases/latest` is read. |
 | `asset` | Regex matched against release asset names (jq `test()`). Must match exactly one asset. |
+| `framework` | `metamod` or `swiftly`. Skipped on servers where that framework is disabled. |
 | `enabled` | `false` skips the entry. |
 | `map` | `from` is a path inside the release archive, `to` is the destination relative to `game/csgo`. `preserve: true` creates missing files only. |
 
@@ -245,8 +249,8 @@ curl -fsSL https://raw.githubusercontent.com/CS2KR/cs2-egg/main/misc/install-cs2
 `egg/configs/plugins.json` 에 적힌 플러그인을 GitHub 최신 릴리스로 갱신합니다. 게임 서버가 아직
 떠 있지 않은 시점이라 핫리로드나 재시작을 걱정할 필요가 없고 접속자도 없습니다.
 
-CounterStrikeSharp 플러그인과 네이티브 Metamod 애드온을 모두 다룹니다. Metamod:Source 와
-CounterStrikeSharp 본체는 원본 egg 가 이미 갱신하므로 여기서 다루지 않습니다.
+네이티브 Metamod 애드온과 SwiftlyS2 플러그인을 다룹니다. Metamod:Source 와 SwiftlyS2 본체는
+egg 가 이미 갱신하므로 여기서 다루지 않습니다. CounterStrikeSharp 지원은 2026-07-12 에 걷어냈습니다.
 
 원칙은 중요한 순서대로 다음과 같습니다.
 

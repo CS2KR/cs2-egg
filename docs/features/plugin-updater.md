@@ -5,9 +5,8 @@ CS2.KR 이 원본 egg 에 더한 기능입니다. 컨테이너가 기동할 때,
 
 게임 서버가 아직 떠 있지 않은 시점이라 핫리로드나 재시작을 걱정할 필요가 없고 접속자도 없습니다.
 
-CounterStrikeSharp 플러그인과 네이티브 Metamod 애드온을 모두 다룹니다. Metamod:Source 와
-CounterStrikeSharp **본체**는 원본 egg 가 이미 갱신하므로 여기서 다루지 않습니다
-([프레임워크 자동업데이트](auto-updaters.md) 참고).
+네이티브 Metamod 애드온과 SwiftlyS2 플러그인을 다룹니다. Metamod:Source 와 SwiftlyS2 **본체**는
+egg 가 이미 갱신하므로 여기서 다루지 않습니다 ([프레임워크 자동업데이트](auto-updaters.md) 참고).
 
 ## 원칙
 
@@ -33,13 +32,14 @@ CounterStrikeSharp **본체**는 원본 egg 가 이미 갱신하므로 여기서
   "version": "1.0.0",
   "plugins": [
     {
-      "name": "WeaponPaints",
-      "repo": "Nereziel/cs2-WeaponPaints",
-      "asset": "^WeaponPaints\\.zip$",
+      "name": "WeaponSkins",
+      "detect": "addons/swiftlys2/plugins/WeaponSkins",
+      "repo": "samyycX/WeaponSkins",
+      "asset": "^WeaponSkins-v.*\\.zip$",
+      "framework": "swiftly",
       "enabled": true,
       "map": [
-        { "from": "WeaponPaints", "to": "addons/counterstrikesharp/plugins/WeaponPaints" },
-        { "from": "gamedata", "to": "addons/counterstrikesharp/gamedata" }
+        { "from": "WeaponSkins", "to": "addons/swiftlys2/plugins/WeaponSkins" }
       ]
     },
     {
@@ -47,6 +47,7 @@ CounterStrikeSharp **본체**는 원본 egg 가 이미 갱신하므로 여기서
       "detect": "addons/cs2kz",
       "repo": "KZGlobalTeam/cs2kz-metamod",
       "asset": "^cs2kz-linux-master-upgrade\\.tar\\.gz$",
+      "framework": "metamod",
       "map": [
         { "from": "addons/cs2kz", "to": "addons/cs2kz" },
         { "from": "addons/metamod", "to": "addons/metamod" },
@@ -60,9 +61,10 @@ CounterStrikeSharp **본체**는 원본 egg 가 이미 갱신하므로 여기서
 | 항목 | 뜻 |
 |---|---|
 | `name` | `egg/plugin-versions.txt` 에 버전을 기록할 때 쓰는 키입니다. |
-| `detect` | 이 경로(`game/csgo` 기준)가 있어야 갱신합니다. 생략하면 `addons/counterstrikesharp/plugins/<name>` 으로 봅니다. |
+| `detect` | 설치 여부를 판정할 경로(`game/csgo` 기준)입니다. 필수입니다. |
 | `repo` | GitHub `owner/repo`. `releases/latest` 만 읽습니다. |
 | `asset` | 릴리스 에셋 이름에 대한 정규식(jq `test()`). 정확히 하나만 걸려야 합니다. |
+| `framework` | `metamod` 또는 `swiftly`. 그 프레임워크가 꺼진 서버에서는 설치하지 않습니다. |
 | `enabled` | `false` 면 건너뜁니다. |
 | `map` | `from` 은 아카이브 안의 경로, `to` 는 `game/csgo` 기준 목적지입니다. `preserve: true` 면 없는 파일만 채웁니다. |
 
@@ -94,5 +96,5 @@ CounterStrikeSharp **본체**는 원본 egg 가 이미 갱신하므로 여기서
 
 - `docker/scripts/plugin-update.sh` — 실제 로직
 - `docker/scripts/updaters/thirdparty.sh` — 활성화 여부·타임아웃·fail-open 을 다루는 얇은 래퍼
-- `docker/scripts/update.sh` 의 `update_addons` 끝에서 호출됩니다. Metamod 와 CounterStrikeSharp
+- `docker/scripts/update.sh` 의 `update_addons` 끝에서 호출됩니다. Metamod 와 SwiftlyS2
   본체가 갱신된 **뒤에** 돌아야 하기 때문입니다.

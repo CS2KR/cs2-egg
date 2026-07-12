@@ -4,7 +4,7 @@ source /utils/logging.sh
 
 # 설정 파일 버전. 필드나 설명을 바꾸면 올린다.
 # 올리면 기존 파일을 다시 만들고 apply_smart_merge 가 사용자가 바꾼 '값' 만 되살린다.
-CONFIG_VERSION="1.2.0"
+CONFIG_VERSION="1.3.0"
 
 # Use organized egg directory structure
 CONFIG_DIR="${EGG_CONFIGS_DIR:-/home/container/egg/configs}"
@@ -197,15 +197,6 @@ create_cleanup_config() {
       "directories": ["./game/csgo"],
       "patterns": ["*.dem"],
       "hours": 168,
-      "recursive": true,
-      "enabled": true
-    },
-    {
-      "name": "css_logs",
-      "description": "CounterStrikeSharp 로그 파일입니다.",
-      "directories": ["./game/csgo/addons/counterstrikesharp/logs"],
-      "patterns": ["*.txt"],
-      "hours": 72,
       "recursive": true,
       "enabled": true
     },

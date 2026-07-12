@@ -70,7 +70,7 @@ egg 를 바꾸기 전에는 항상 서버 파일을 백업하세요.
 - [설정 파일](../configuration/configuration-files.md) — 기능을 켜고 값을 바꾸기
 - [서드파티 플러그인 자동업데이트](../features/plugin-updater.md) — 기동 시 플러그인을 최신 릴리스로
 - [VPK 동기화와 중앙 업데이트](../features/vpk-sync.md) — 여러 서버가 게임 파일을 공유하기
-- [프레임워크 자동업데이트](../features/auto-updaters.md) — MetaMod·CounterStrikeSharp 등 자동 갱신
+- [프레임워크 자동업데이트](../features/auto-updaters.md) — MetaMod·SwiftlyS2 등 자동 갱신
 - [문제 해결](../advanced/troubleshooting.md) — 흔한 문제와 해법
 
 ## Docker 이미지

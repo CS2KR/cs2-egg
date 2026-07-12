@@ -65,12 +65,11 @@ egg 에 적힌 이미지는 서버가 뜰 때 자동으로 당겨집니다.
 
 ### 프레임워크
 
-네 가지를 각각 켜고 끌 수 있습니다.
+세 가지를 각각 켜고 끌 수 있습니다.
 
 | 변수 | 프레임워크 |
 | --- | --- |
 | `INSTALL_METAMOD` | MetaMod:Source |
-| `INSTALL_CSS` | CounterStrikeSharp |
 | `INSTALL_SWIFTLY` | SwiftlyS2 |
 | `INSTALL_MODSHARP` | ModSharp |
 
@@ -83,7 +82,7 @@ egg 에 적힌 이미지는 서버가 뜰 때 자동으로 당겨집니다.
 
 **의존 관계**
 
-- CounterStrikeSharp 를 켜면 MetaMod 가 자동으로 함께 켜집니다 (필수 전제).
+- MetaMod 는 네이티브 애드온(cs2kz, cs2fixes, cs2bhop …)의 전제 조건입니다.
 - SwiftlyS2 와 ModSharp 는 단독으로 돕니다 (MetaMod 불필요).
 
 자세한 내용은 [프레임워크 자동업데이트](../features/auto-updaters.md) 를 보세요.
@@ -107,7 +106,6 @@ CS2 가 갱신되면 서버를 자동으로 다시 띄울 수 있습니다. [VPK
 
 ```
 Metamod=2.x-dev1245
-CSS=v1.1.0
 Swiftly=v0.2.38
 ModSharp=git70
 DotNet=9.0.0

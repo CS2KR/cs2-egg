@@ -100,7 +100,7 @@
 - `recursive` — `true` 면 하위 디렉터리까지
 - `enabled` — `false` 면 규칙을 지우지 않고 끕니다
 
-기본 규칙: `backup_rounds`, `demos`, `css_logs`, `swiftly_logs`, `accelerator_dumps`, `core_dumps`.
+기본 규칙: `backup_rounds`, `demos`, `swiftly_logs`, `accelerator_dumps`, `core_dumps`.
 
 예시가 더 필요하면 → [features/cleanup.md](../features/cleanup.md)
 

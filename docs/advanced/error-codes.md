@@ -273,7 +273,7 @@ ls -la "$SYNC_LOCATION"
 **흔한 원인**:
 
 1. **플러그인 문제** — 최근에 설치하거나 갱신한 플러그인이 지금 CS2 버전과 맞지 않습니다. 하나씩 꺼 가며 범위를 좁히세요.
-2. **애드온 호환성** — MetaMod / CounterStrikeSharp / SwiftlyS2 / ModSharp 가 낡았습니다. egg 의 자동 업데이터로 전부 갱신하세요. `gameinfo.gi` 의 로드 순서도 확인하세요. **MetaMod 가 반드시 먼저** 와야 합니다.
+2. **애드온 호환성** — MetaMod / SwiftlyS2 / ModSharp 가 낡았습니다. egg 의 자동 업데이터로 전부 갱신하세요. `gameinfo.gi` 의 로드 순서도 확인하세요. **MetaMod 가 반드시 먼저** 와야 합니다.
 3. **낡은 gamedata** — CS2 업데이트 뒤 플러그인의 gamedata(오프셋·시그니처)가 깨졌습니다. https://gdc.eternar.dev 에서 확인하세요.
 
 **해결**:

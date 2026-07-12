@@ -9,7 +9,6 @@ TEMP_DIR="./temps"
 
 # Source modular updaters
 source /scripts/updaters/metamod.sh
-source /scripts/updaters/counterstrikesharp.sh
 source /scripts/updaters/swiftlys2.sh
 source /scripts/updaters/modsharp.sh
 source /scripts/updaters/thirdparty.sh
@@ -18,12 +17,8 @@ source /scripts/updaters/thirdparty.sh
 migrate_addon_selection() {
     if [ -n "${ADDON_SELECTION}" ]; then
         case "${ADDON_SELECTION}" in
-            "Metamod Only")
+            "Metamod Only" | "Metamod + CounterStrikeSharp")
                 INSTALL_METAMOD=1
-                ;;
-            "Metamod + CounterStrikeSharp")
-                INSTALL_METAMOD=1
-                INSTALL_CSS=1
                 ;;
             "SwiftlyS2")
                 INSTALL_SWIFTLY=1
@@ -47,26 +42,14 @@ update_addons() {
     # Backwards compatibility migration
     migrate_addon_selection
 
-    # Dependency check: CSS requires MetaMod
-    if [ "${INSTALL_CSS:-0}" -eq 1 ] && [ "${INSTALL_METAMOD:-0}" -ne 1 ]; then
-        log_message "CounterStrikeSharp 는 MetaMod:Source 가 필요합니다. 자동으로 켭니다..." "warning"
-        INSTALL_METAMOD=1
-    fi
-
     # Consolidated ModSharp incompatibility check
     modsharp_is_present=false
     if [ "${INSTALL_MODSHARP:-0}" -eq 1 ] || grep -q "Game[[:space:]]*sharp" "/home/container/game/csgo/gameinfo.gi" 2>/dev/null; then
         modsharp_is_present=true
     fi
 
-    if [ "$modsharp_is_present" = true ]; then
-        if [ "${INSTALL_CSS:-0}" -eq 1 ]; then
-            log_message "ModSharp 와 CounterStrikeSharp 가 함께 있습니다. 서로 충돌할 수 있으니 하나만 쓰기를 권합니다." "warning"
-        fi
-
-        if [ "${INSTALL_SWIFTLY:-0}" -eq 1 ]; then
-            log_message "ModSharp 와 SwiftlyS2 가 함께 있습니다. 서로 충돌할 수 있으니 하나만 쓰기를 권합니다." "warning"
-        fi
+    if [ "$modsharp_is_present" = true ] && [ "${INSTALL_SWIFTLY:-0}" -eq 1 ]; then
+        log_message "ModSharp 와 SwiftlyS2 가 함께 있습니다. 서로 충돌할 수 있으니 하나만 쓰기를 권합니다." "warning"
     fi
 
     # MetaMod:Source
@@ -79,15 +62,6 @@ update_addons() {
 
         # Configure metamod in gameinfo.gi
         add_to_gameinfo "csgo/addons/metamod"
-    fi
-
-    # CounterStrikeSharp
-    if [ "${INSTALL_CSS:-0}" -eq 1 ]; then
-        if type update_counterstrikesharp &>/dev/null; then
-            update_counterstrikesharp
-        else
-            log_message "update_counterstrikesharp 함수를 찾을 수 없습니다" "error"
-        fi
     fi
 
     # SwiftlyS2 (standalone)
@@ -127,7 +101,7 @@ update_addons() {
     # Patch RequireLoginForDedicatedServers setting based on ALLOW_TOKENLESS
     patch_tokenless_setting
 
-    # CS2.KR: 서드파티 플러그인 갱신 (Metamod/CSS 본체가 갱신된 뒤에 돌아야 한다)
+    # CS2.KR: 서드파티 플러그인 갱신 (Metamod/SwiftlyS2 본체가 갱신된 뒤에 돌아야 한다)
     update_thirdparty_plugins
 
     # Clean up

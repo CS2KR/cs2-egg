@@ -2,8 +2,8 @@
 # CS2 기동 직전에 서드파티 플러그인을 GitHub 최신 릴리스로 갱신·설치한다.
 # 플러그인 목록은 이미지에 구운 카탈로그(/scripts/plugins-catalog.json)를 쓰고,
 # 무엇을 켤지는 egg 변수로 정한다 — 각 플러그인의 PLUGIN_<NAME>(0/1) + 프레임워크
-# 게이팅(metamod=INSTALL_METAMOD, css=INSTALL_CSS, swiftly=INSTALL_SWIFTLY 가 1일 때만).
-# Metamod:Source 본체와 CSS/SwiftlyS2 본체는 egg 가 따로 갱신한다.
+# 게이팅(metamod=INSTALL_METAMOD, swiftly=INSTALL_SWIFTLY 가 1일 때만).
+# Metamod:Source 본체와 SwiftlyS2 본체는 egg 가 따로 갱신한다.
 
 set -uo pipefail
 
@@ -140,10 +140,9 @@ while IFS= read -r spec; do
     fi
 
     # 프레임워크 게이팅 — 해당 프레임워크가 꺼져 있으면 이 플러그인은 설치하지 않는다.
-    framework=$(jq -r '.framework // "css"' <<<"$spec")
+    framework=$(jq -r '.framework // empty' <<<"$spec")
     case "$framework" in
         metamod) fw_on="${INSTALL_METAMOD:-0}" ;;
-        css)     fw_on="${INSTALL_CSS:-0}" ;;
         swiftly) fw_on="${INSTALL_SWIFTLY:-0}" ;;
         *)       fw_on=0 ;;
     esac
@@ -163,7 +162,7 @@ while IFS= read -r spec; do
 
     # 여기까지 왔으면 이 서버에서 켠 플러그인. 없으면 새로 설치하고 있으면 안전 갱신한다.
     # apply_plugin 이 map 대상에 rsync 병합하므로 설치와 갱신은 같은 경로다.
-    detect=$(jq -r '.detect // ("addons/counterstrikesharp/plugins/" + .name)' <<<"$spec")
+    detect=$(jq -r '.detect' <<<"$spec")
     if [ ! -e "$GAME_DIR/$detect" ]; then
         log "$name: 미설치 — 새로 설치합니다"
     fi

@@ -22,7 +22,7 @@
 
 - [서드파티 플러그인 자동업데이트](features/plugin-updater.md) — 기동 시 플러그인을 최신 릴리스로 (CS2.KR 이 더한 기능)
 - [VPK 동기화와 중앙 업데이트](features/vpk-sync.md) — 저장 공간 80% 절약 + CS2 자동 갱신
-- [프레임워크 자동업데이트](features/auto-updaters.md) — MetaMod·CounterStrikeSharp·SwiftlyS2·ModSharp
+- [프레임워크 자동업데이트](features/auto-updaters.md) — MetaMod·SwiftlyS2·ModSharp
 - [자동 정리](features/cleanup.md) — 오래된 로그·데모·덤프 지우기
 
 ### 설정
@@ -39,7 +39,7 @@
 ## 주요 기능
 
 - **서드파티 플러그인 자동업데이트** — 기동 시 `egg/configs/plugins.json` 에 적힌 플러그인만 최신 릴리스로 (CS2.KR 이 더한 것)
-- **프레임워크 자동업데이트** — MetaMod, CounterStrikeSharp, SwiftlyS2, ModSharp
+- **프레임워크 자동업데이트** — MetaMod, SwiftlyS2, ModSharp
 - **자동 재시작** — CS2 업데이트를 감지해 서버를 다시 띄움
 - **VPK 동기화** — 게임 파일을 한곳에 두어 서버당 약 52GB 절약
 - **자동 정리** — JSON 규칙으로 오래된 파일 삭제

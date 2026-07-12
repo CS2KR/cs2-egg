@@ -1,14 +1,15 @@
 # 프레임워크 자동업데이트
 
-서버가 기동할 때 MetaMod, CounterStrikeSharp, SwiftlyS2, ModSharp 를 각각 최신으로 갱신합니다.
+서버가 기동할 때 MetaMod, SwiftlyS2, ModSharp 를 각각 최신으로 갱신합니다.
 
-서드파티 **플러그인**(WeaponPaints, cs2kz 등)은 이것과 별개입니다.
+서드파티 **플러그인**(WeaponSkins, cs2kz 등)은 이것과 별개입니다.
 [서드파티 플러그인 자동업데이트](plugin-updater.md) 를 보세요.
+
+> CounterStrikeSharp 지원은 2026-07-12 에 걷어냈습니다. C# 플러그인은 SwiftlyS2 를 쓰세요.
 
 ## 개요
 
-- **MetaMod:Source** — 플러그인 프레임워크의 토대 (CSS 의 전제 조건)
-- **CounterStrikeSharp (CSS)** — C# 플러그인 프레임워크
+- **MetaMod:Source** — 네이티브 애드온(cs2kz, cs2fixes, cs2bhop …)의 토대
 - **SwiftlyS2** — 단독으로 도는 C# 프레임워크 (MetaMod 불필요)
 - **ModSharp** — .NET 런타임을 품은 단독 C# 플랫폼
 
@@ -22,8 +23,7 @@
 
 | 변수 | 설명 |
 | --- | --- |
-| `INSTALL_METAMOD` | MetaMod:Source (CSS 의 전제 조건) |
-| `INSTALL_CSS` | CounterStrikeSharp (켜면 MetaMod 가 자동으로 함께 켜짐) |
+| `INSTALL_METAMOD` | MetaMod:Source (네이티브 애드온의 전제 조건) |
 | `INSTALL_SWIFTLY` | SwiftlyS2 (단독) |
 | `INSTALL_MODSHARP` | ModSharp (단독) |
 
@@ -39,17 +39,8 @@
 
 ```bash
 INSTALL_METAMOD=1
-INSTALL_CSS=1
-INSTALL_SWIFTLY=0
+INSTALL_SWIFTLY=1
 INSTALL_MODSHARP=0
-```
-
-### 의존 관계
-
-CSS 를 켰는데 MetaMod 가 꺼져 있으면 egg 가 알아서 켭니다.
-
-```
-CS2.KR | 경고   | CounterStrikeSharp 는 MetaMod:Source 가 필요합니다. 자동으로 켭니다...
 ```
 
 ### 함께 쓰면 충돌할 수 있는 조합
@@ -58,16 +49,13 @@ ModSharp 는 다른 C# 프레임워크와 잘 맞지 않습니다. 함께 켜져
 자동으로 꺼 주지는 않습니다. 하나만 쓰세요.
 
 ```
-CS2.KR | 경고   | ModSharp 와 CounterStrikeSharp 가 함께 있습니다. 서로 충돌할 수 있으니 하나만 쓰기를 권합니다.
 CS2.KR | 경고   | ModSharp 와 SwiftlyS2 가 함께 있습니다. 서로 충돌할 수 있으니 하나만 쓰기를 권합니다.
 ```
 
 | 조합 | 상태 |
 | --- | --- |
-| MetaMod + CSS | 권장 |
-| MetaMod + CSS + SwiftlyS2 | 함께 쓸 수 있음 |
+| MetaMod + SwiftlyS2 | 권장 |
 | MetaMod + ModSharp | 함께 쓸 수 있음 |
-| ModSharp + CSS | 충돌 가능 (경고만 나옴) |
 | ModSharp + SwiftlyS2 | 충돌 가능 (경고만 나옴) |
 
 ### 로드 순서
@@ -78,7 +66,6 @@ egg 가 `ensure_metamod_first()` 로 알아서 맞춥니다.
 ```
 Game_LowViolence    csgo_lv
             Game    csgo/addons/metamod        ← 항상 첫 번째
-            Game    csgo/addons/counterstrikesharp
             Game    csgo/addons/swiftlys2
             Game    sharp                       ← ModSharp
 
@@ -96,21 +83,6 @@ Game_LowViolence    csgo_lv
 CS2.KR | 정보   | Metamod 갱신: 2.x-dev1245 (현재: 2.x-dev1234)
 CS2.KR | 완료   | Metamod 를 2.x-dev1245 으로 갱신했습니다
 ```
-
-## CounterStrikeSharp
-
-- GitHub 릴리스(`roflmuffin/CounterStrikeSharp`)에서 최신본을 받습니다.
-- `game/csgo/addons/counterstrikesharp/` 에 풉니다.
-- .NET 런타임이 포함된 빌드를 씁니다.
-- MetaMod 가 꺼져 있으면 자동으로 켭니다.
-
-```
-CS2.KR | 경고   | CounterStrikeSharp 는 MetaMod:Source 가 필요합니다. 자동으로 켭니다...
-CS2.KR | 완료   | CounterStrikeSharp 는 최신입니다 (v1.0.370)
-```
-
-**플러그인 호환성**: CSS 를 올리면 플러그인이 깨질 수 있습니다. 테스트 서버에서 먼저 확인하고,
-플러그인의 변경 기록을 살펴보세요.
 
 ## SwiftlyS2
 
@@ -146,7 +118,6 @@ CS2.KR | 완료   | ModSharp 를 git70 으로 갱신했습니다
 
 ```
 Metamod=2.x-dev1245
-CSS=v1.1.0
 Swiftly=v0.2.38
 ModSharp=git70
 DotNet=9.0.0
@@ -169,7 +140,7 @@ FTP 로 볼 수 있고 서버 백업에도 함께 들어갑니다.
 
 ### 특정 프레임워크만 안 받기
 
-패널에서 그 프레임워크를 끄거나 환경변수를 `0` 으로 둡니다 (`INSTALL_CSS=0`).
+패널에서 그 프레임워크를 끄거나 환경변수를 `0` 으로 둡니다 (`INSTALL_SWIFTLY=0`).
 
 ### 프리릴리스 받기
 
@@ -205,19 +176,11 @@ gameinfo.gi 로드 순서 확인
 curl -I https://www.metamodsource.net/downloads.php?branch=dev
 ```
 
-### CSS 가 설치되지 않을 때
+### SwiftlyS2 가 설치되지 않을 때
 
-- MetaMod 가 자동으로 켜졌는지 로그의 경고를 확인하세요.
-- GitHub API 한도에 걸리지 않았는지 확인하세요.
+- GitHub API 한도에 걸리지 않았는지 확인하세요. 대개 이것입니다.
 - 디스크 여유를 확인하세요.
-
-흔한 오류입니다.
-
-```
-CS2.KR | 오류   | roflmuffin/CounterStrikeSharp 에서 알맞은 에셋을 찾지 못했습니다
-```
-
-대개 GitHub API 한도입니다. 한 시간 기다리거나 네트워크를 확인하세요.
+- `gameinfo.gi` 에 `csgo/addons/swiftlys2` 가 들어갔는지 확인하세요.
 
 ### ModSharp 가 설치되지 않을 때
 
@@ -263,16 +226,17 @@ API rate limit exceeded  /  403 Forbidden
 | 옛 값 | 새 설정 |
 | --- | --- |
 | `Metamod Only` | `INSTALL_METAMOD=1` |
-| `Metamod + CounterStrikeSharp` | `INSTALL_METAMOD=1` + `INSTALL_CSS=1` |
+| `Metamod + CounterStrikeSharp` | `INSTALL_METAMOD=1` (CSS 는 더 이상 설치되지 않습니다) |
 | `SwiftlyS2` | `INSTALL_SWIFTLY=1` |
 | `ModSharp` | `INSTALL_MODSHARP=1` |
 
 ## 자주 묻는 것
 
-**CSS 와 SwiftlyS2 를 함께 쓸 수 있나요?**
-네. 서로 호환됩니다.
+**CounterStrikeSharp 는 어디 갔나요?**
+2026-07-12 에 egg 에서 걷어냈습니다. `INSTALL_CSS` 변수도 없어졌습니다. C# 플러그인은 SwiftlyS2 를 쓰세요.
+볼륨에 이미 있는 `addons/counterstrikesharp/` 는 egg 가 건드리지 않으니 필요하면 직접 지우세요.
 
-**CSS 와 ModSharp 를 함께 쓸 수 있나요?**
+**SwiftlyS2 와 ModSharp 를 함께 쓸 수 있나요?**
 권하지 않습니다. 충돌할 수 있고, egg 는 경고만 하고 자동으로 끄지는 않습니다.
 
 **ModSharp 와 함께 쓸 수 있는 것은?**
@@ -283,9 +247,6 @@ MetaMod 뿐입니다.
 
 **되돌릴 수 있나요?**
 직접 옛 버전을 설치하고 그 프레임워크의 자동업데이트를 끄면 됩니다.
-
-**MetaMod 만 갱신하고 CSS 는 그대로 두려면?**
-CSS 를 끄고 MetaMod 만 켜 두세요.
 
 **베타도 받을 수 있나요?**
 `PRERELEASE=1` 로 두면 받습니다.

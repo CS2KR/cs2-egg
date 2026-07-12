@@ -127,15 +127,6 @@ grep '^GITHUB_REPO=' /usr/local/bin/update-cs2-centralized.sh
 5. 콘솔에 다운로드 에러가 없는지 보세요.
 6. `egg/versions.txt` 를 지우고 재시작해 강제로 다시 받게 하세요.
 
-### CounterStrikeSharp 가 갱신되지 않을 때
-
-1. **Startup** 탭에서 `INSTALL_CSS` 를 `1` 로 두세요.
-2. MetaMod 는 전제 조건이라 자동으로 켜집니다. 경고 메시지를 확인하세요.
-3. GitHub API 한도에 걸리지 않았는지 확인하세요.
-4. `game/csgo/addons/counterstrikesharp/` 를 확인하세요.
-5. 콘솔의 다운로드·압축 해제 에러를 보세요.
-6. `egg/versions.txt` 를 지우고 재시작하세요.
-
 ### SwiftlyS2 가 설치되지 않을 때
 
 1. **Startup** 탭에서 `INSTALL_SWIFTLY` 를 `1` 로 두세요.
@@ -152,7 +143,7 @@ grep '^GITHUB_REPO=' /usr/local/bin/update-cs2-centralized.sh
 4. `game/sharp/` 가 있는지 확인하세요.
 5. 콘솔의 다운로드·압축 해제 에러를 보세요.
 
-> ModSharp 와 CounterStrikeSharp 를 함께 켜면 egg 는 **경고만** 하고 자동으로 꺼 주지 않습니다.
+> ModSharp 와 SwiftlyS2 를 함께 켜면 egg 는 **경고만** 하고 자동으로 꺼 주지 않습니다.
 > 플러그인이 이상하게 동작하면 하나만 켜세요.
 
 ## 서드파티 플러그인 자동업데이트
