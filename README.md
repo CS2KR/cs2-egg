@@ -28,9 +28,10 @@ repair path. Details: [Centralized game files](#centralized-game-files-vpk-sync)
 
 ### What this adds on top of upstream
 
-**A third-party plugin auto-updater.** On container start — before `cs2` launches — the egg updates the
-plugins listed in the server's `egg/configs/plugins.json` to their latest GitHub release. The game server
-is not running yet, so there is no hot-reload to worry about and no players are online.
+**A third-party plugin auto-updater.** On container start — before `cs2` launches — the egg installs and
+updates the plugins this server has enabled (`PLUGIN_<NAME>=1`) to their latest GitHub release, using the
+catalog baked into the image. The game server is not running yet, so there is no hot-reload to worry about
+and no players are online.
 
 It covers native Metamod addons and SwiftlyS2 plugins. Metamod:Source and SwiftlyS2 themselves are
 already kept up to date by the egg's framework updaters, so they are not managed here.
@@ -52,9 +53,9 @@ Implementation: [`docker/scripts/plugin-update.sh`](docker/scripts/plugin-update
 [`docker/scripts/updaters/thirdparty.sh`](docker/scripts/updaters/thirdparty.sh), called at the end of
 `update_addons` in [`docker/scripts/update.sh`](docker/scripts/update.sh).
 
-### Manifest
+### Catalog
 
-`egg/configs/plugins.json`, inside the server volume:
+`docker/scripts/plugins-catalog.json`, baked into the image:
 
 ```json
 {
@@ -245,9 +246,9 @@ curl -fsSL https://raw.githubusercontent.com/CS2KR/cs2-egg/main/misc/install-cs2
 
 ### 원본에 더한 것
 
-**서드파티 플러그인 자동업데이트** 하나입니다. 컨테이너가 기동할 때 cs2 가 뜨기 전에, 볼륨의
-`egg/configs/plugins.json` 에 적힌 플러그인을 GitHub 최신 릴리스로 갱신합니다. 게임 서버가 아직
-떠 있지 않은 시점이라 핫리로드나 재시작을 걱정할 필요가 없고 접속자도 없습니다.
+**서드파티 플러그인 자동업데이트** 하나입니다. 컨테이너가 기동할 때 cs2 가 뜨기 전에, 이미지에 구운
+카탈로그에서 이 서버가 켠 플러그인(`PLUGIN_<NAME>=1`)을 GitHub 최신 릴리스로 설치·갱신합니다. 게임 서버가
+아직 떠 있지 않은 시점이라 핫리로드나 재시작을 걱정할 필요가 없고 접속자도 없습니다.
 
 네이티브 Metamod 애드온과 SwiftlyS2 플러그인을 다룹니다. Metamod:Source 와 SwiftlyS2 본체는
 egg 가 이미 갱신하므로 여기서 다루지 않습니다. CounterStrikeSharp 지원은 2026-07-12 에 걷어냈습니다.

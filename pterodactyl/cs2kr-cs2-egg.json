@@ -7,7 +7,7 @@
   "exported_at": "2026-03-30T16:51:51+00:00",
   "name": "CS2.KR CS2 Egg",
   "author": "contact@cs2.kr",
-  "description": "CS2.KR 게임 서버용 egg 입니다. K4ryuu/CS2-Egg (GPL-3.0) 를 기반으로 서드파티 플러그인 자동업데이터를 더했습니다. 볼륨의 egg/configs/plugins.json 에 적힌 플러그인만 기동할 때 GitHub 최신 릴리스로 갱신합니다.",
+  "description": "CS2.KR 게임 서버용 egg 입니다. K4ryuu/CS2-Egg (GPL-3.0) 를 기반으로 서드파티 플러그인 자동업데이터를 더했습니다. 카탈로그에 있는 플러그인 중 이 서버에서 켠 것만 기동할 때 GitHub 최신 릴리스로 갱신합니다.",
   "features": [],
   "docker_images": {
     "CS2.KR CS2 Egg": "ghcr.io/cs2kr/cs2-egg:latest"
@@ -220,7 +220,7 @@
     },
     {
       "name": "서드파티 플러그인 자동업데이트",
-      "description": "1 이면 기동할 때 볼륨의 egg/configs/plugins.json 에 적힌 서드파티 플러그인을 GitHub 최신 릴리스로 갱신합니다. 이미 설치된 것만 갱신하며 기존 설정 파일은 덮어쓰지 않습니다. 실패해도 서버는 그대로 뜹니다.",
+      "description": "1 이면 기동할 때 아래 플러그인 변수로 켠 서드파티 플러그인을 GitHub 최신 릴리스로 설치·갱신합니다. 기존 설정 파일은 덮어쓰지 않습니다. 실패해도 서버는 그대로 뜹니다.",
       "env_variable": "PLUGIN_UPDATE_ENABLED",
       "default_value": "1",
       "user_viewable": true,
