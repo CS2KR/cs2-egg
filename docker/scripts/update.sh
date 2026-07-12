@@ -104,6 +104,16 @@ update_addons() {
     # CS2.KR: 서드파티 플러그인 갱신 (Metamod/SwiftlyS2 본체가 갱신된 뒤에 돌아야 한다)
     update_thirdparty_plugins
 
+    # CS2.KR: WeaponSkins 는 FollowCS2ServerGuidelines=false 여야 스킨이 적용된다.
+    # core.jsonc 는 주석이 들어간 JSONC 라 jq 로 못 읽는다. 해당 줄만 바꾼다.
+    if [ "${PLUGIN_WEAPONSKINS:-0}" -eq 1 ]; then
+        local SW2_CORE="/home/container/game/csgo/addons/swiftlys2/configs/core.jsonc"
+        if [ -f "$SW2_CORE" ] && grep -q '"FollowCS2ServerGuidelines"[[:space:]]*:[[:space:]]*true' "$SW2_CORE"; then
+            sed -i 's/"FollowCS2ServerGuidelines"[[:space:]]*:[[:space:]]*true/"FollowCS2ServerGuidelines": false/' "$SW2_CORE"
+            log_message "WeaponSkins 때문에 FollowCS2ServerGuidelines 를 false 로 바꿨습니다" "info"
+        fi
+    fi
+
     # Clean up
     rm -rf "$TEMP_DIR"
 }

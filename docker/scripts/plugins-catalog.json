@@ -271,6 +271,21 @@
       "env": "PLUGIN_CS2FIXES"
     },
     {
+      "name": "zResourcePrecacher",
+      "detect": "addons/swiftlys2/plugins/zResourcePrecacher",
+      "repo": "zhw1nq/zResourcePrecacher_SW2",
+      "asset": "^zResourcePrecacher\\.zip$",
+      "enabled": true,
+      "map": [
+        {
+          "from": "zResourcePrecacher",
+          "to": "addons/swiftlys2/plugins/zResourcePrecacher"
+        }
+      ],
+      "framework": "swiftly",
+      "env": "PLUGIN_ZRESOURCEPRECACHER"
+    },
+    {
       "name": "WeaponSkins",
       "detect": "addons/swiftlys2/plugins/WeaponSkins",
       "repo": "samyycX/WeaponSkins",

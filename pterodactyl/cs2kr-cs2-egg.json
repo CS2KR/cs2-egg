@@ -329,8 +329,18 @@
       "field_type": "text"
     },
     {
+      "name": "플러그인: zResourcePrecacher",
+      "description": "1 이면 이 서버에 zResourcePrecacher 을(를) 설치하고 기동할 때 최신으로 갱신합니다. SwiftlyS2 플러그인이라 INSTALL_SWIFTLY=1 일 때만 설치됩니다.",
+      "env_variable": "PLUGIN_ZRESOURCEPRECACHER",
+      "default_value": "0",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|boolean",
+      "field_type": "text"
+    },
+    {
       "name": "플러그인: WeaponSkins",
-      "description": "1 이면 이 서버에 WeaponSkins 을(를) 설치하고 기동할 때 최신으로 갱신합니다. SwiftlyS2 플러그인이라 INSTALL_SWIFTLY=1 일 때만 설치됩니다.",
+      "description": "1 이면 이 서버에 WeaponSkins 을(를) 설치하고 기동할 때 최신으로 갱신합니다. SwiftlyS2 플러그인이라 INSTALL_SWIFTLY=1 일 때만 설치됩니다. 켜면 egg 가 SwiftlyS2 core.jsonc 의 FollowCS2ServerGuidelines 를 false 로 맞춥니다 (스킨 적용에 필요).",
       "env_variable": "PLUGIN_WEAPONSKINS",
       "default_value": "1",
       "user_viewable": true,
